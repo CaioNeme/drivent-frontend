@@ -20,7 +20,7 @@ npm i
 4. Run the back-end in a development environment:
 
 ```bash
-npm run start
+npm run dev
 ```
 
 ## Building and starting for production
