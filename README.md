@@ -30,6 +30,8 @@ npm run build
 npm start
 ```
 
+so um teste
+
 ## What to do when add new ENV VARIABLES
 
 - Add them to `.env.example` file
