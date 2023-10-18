@@ -34,7 +34,7 @@ export default function HotelIndex() {
     <>
       <StyledTypography variant="h4">Escolha de hotel e quarto</StyledTypography>
       {!loading && <ErrorMsg hotel={includesHotel} paid={isPaid} />}
-      {!loading && <PickHotel />}
+      {!loading && includesHotel && isPaid && <PickHotel />}
     </>
   );
 }

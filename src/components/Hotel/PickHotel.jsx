@@ -36,6 +36,8 @@ const HotelCardContainer = styled.div`
   display: flex;
   align-items: center;
 
+  padding-bottom: 15px;
+
   > * {
     &:first-child {
       margin-left: 0px;
