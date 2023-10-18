@@ -4,9 +4,11 @@ import styled from 'styled-components';
 import Typography from '@mui/material/Typography';
 import { getUserTicket } from '../../services/ticketApi.js';
 import UserContext from '../../contexts/UserContext.jsx';
-import { ErrorMsg } from './ErrorMsg.jsx';
+import ErrorMsg from './ErrorMsg.jsx';
+import PickHotel from './PickHotel.jsx';
 
-export default function PickHotel() {
+export default function HotelIndex() {
+  const [loading, setLoading] = useState(true);
   const [ticket, setTicket] = useState(undefined);
   const [includesHotel, setIncludesHotel] = useState(false);
   const [isPaid, setIsPaid] = useState(false);
@@ -14,6 +16,7 @@ export default function PickHotel() {
 
   useEffect(() => {
     (async () => {
+      setLoading(true);
       try {
         const response = await getUserTicket(userData.token);
         setTicket(response);
@@ -23,14 +26,15 @@ export default function PickHotel() {
       } catch (err) {
         if (err.status === 404) setIncludesHotel(false);
       }
+      setLoading(false);
     })();
   }, []);
 
   return (
     <>
       <StyledTypography variant="h4">Escolha de hotel e quarto</StyledTypography>
-      {!includesHotel && <ErrorMsg.NoHotels />}
-      {includesHotel && !isPaid && <ErrorMsg.NotPaid />}
+      {!loading && <ErrorMsg hotel={includesHotel} paid={isPaid} />}
+      {!loading && <PickHotel />}
     </>
   );
 }

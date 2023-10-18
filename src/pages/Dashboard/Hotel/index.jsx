@@ -1,5 +1,5 @@
-import PickHotel from '../../../components/Hotel/index.jsx';
+import HotelIndex from '../../../components/Hotel/index.jsx';
 
 export default function Hotel() {
-  return <PickHotel />;
+  return <HotelIndex />;
 }

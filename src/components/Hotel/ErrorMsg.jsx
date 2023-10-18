@@ -1,22 +1,22 @@
 import styled from 'styled-components';
 
-function NoHotels() {
-  return (
-    <Error>
-      Sua modalidade de ingresso não inclui hospedagem
-      <br /> Prossiga para a escolha de atividades
-    </Error>
-  );
-}
-
-function NotPaid() {
-  return (
-    <ErrorMsg>
-      Você precisa ter confirmado pagamento antes
-      <br />
-      de fazer a escolha de hospedagem
-    </ErrorMsg>
-  );
+export default function ErrorMsg({ hotel, paid}) {
+  if (!hotel) {
+    return (
+      <Error>
+        Sua modalidade de ingresso não inclui hospedagem
+        <br /> Prossiga para a escolha de atividades
+      </Error>
+    );
+  }
+  if (!paid)
+    return (
+      <Error>
+        Você precisa ter confirmado pagamento antes
+        <br />
+        de fazer a escolha de hospedagem
+      </Error>
+    );
 }
 
 const Error = styled.p`
@@ -29,8 +29,3 @@ const Error = styled.p`
   text-align: center;
   color: #8e8e8e;
 `;
-
-export const ErrorMsg = {
-  NoHotels,
-  NotPaid,
-};
