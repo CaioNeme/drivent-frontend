@@ -1,3 +1,5 @@
+import PickHotel from '../../../components/Hotel/index.jsx';
+
 export default function Hotel() {
-  return 'Hotel: Em breve!';
+  return <PickHotel />;
 }
