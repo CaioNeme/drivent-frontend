@@ -29,19 +29,8 @@ export default function PickHotel() {
   return (
     <>
       <StyledTypography variant="h4">Escolha de hotel e quarto</StyledTypography>
-      {!includesHotel && (
-        <ErrorMsg>
-          Sua modalidade de ingresso não inclui hospedagem
-          <br /> Prossiga para a escolha de atividades
-        </ErrorMsg>
-      )}
-      {includesHotel && !isPaid && (
-        <ErrorMsg>
-          Você precisa ter confirmado pagamento antes
-          <br />
-          de fazer a escolha de hospedagem
-        </ErrorMsg>
-      )}
+      {!includesHotel && <ErrorMsg.NoHotels />}
+      {includesHotel && !isPaid && <ErrorMsg.NotPaid />}
     </>
   );
 }
