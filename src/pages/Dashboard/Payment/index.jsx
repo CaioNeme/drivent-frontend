@@ -109,6 +109,7 @@ export default function Payment() {
   )
 }
 
+//! Styled Components
 const Title = styled.div`
   height: 40px;
   width: 338px;
