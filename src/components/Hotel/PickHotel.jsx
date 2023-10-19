@@ -1,18 +1,36 @@
 import styled from 'styled-components';
 import { Typography } from '@mui/material';
 import HotelCard from './HotelCard.jsx';
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { getHotels } from '../../services/hotelApi.js';
+import UserContext from '../../contexts/UserContext.jsx';
 
 export default function PickHotel() {
+  const [hotelsList, setHotelsList] = useState([]);
   const [selectedHotel, setSelectedHotel] = useState(0);
+  const { userData } = useContext(UserContext);
+
+  useEffect(() => {
+    (async () => {
+      const hotels = await getHotels(userData.token);
+      setHotelsList(hotels);
+    })();
+  }, []);
 
   return (
     <>
       <StyledTypography variant={'h6'}>Primeiro, escolha seu hotel</StyledTypography>
       <HotelCardContainer>
-        <HotelCard $hotel={{ id: 1 }} $selected={selectedHotel} $selectHotel={setSelectedHotel} />
-        <HotelCard $hotel={{ id: 2 }} $selected={selectedHotel} $selectHotel={setSelectedHotel} />
-        <HotelCard $hotel={{ id: 3 }} $selected={selectedHotel} $selectHotel={setSelectedHotel} />
+        {hotelsList.map((hotel) => {
+          return (
+            <HotelCard
+              key={'Hotel ' + hotel.id}
+              $hotel={hotel}
+              $selected={selectedHotel}
+              $selectHotel={setSelectedHotel}
+            />
+          );
+        })}
       </HotelCardContainer>
     </>
   );

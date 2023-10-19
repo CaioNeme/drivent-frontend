@@ -4,10 +4,12 @@ import { Typography } from '@mui/material';
 export default function HotelCard({ $hotel, $selectHotel, $selected }) {
   const isSelected = $hotel.id === $selected ? 'true' : 'false';
 
+  console.log($hotel);
+
   return (
     <Card $selected={isSelected} onClick={() => $selectHotel($hotel.id)}>
-      <Photo src="https://cdn.homedsgn.com/wp-content/uploads/2014/05/Modern-Mansion-on-Sunset-Plaza-Drive-01.jpg" />
-      <Name variant="h2">Driven Resort</Name>
+      <Photo src={$hotel.image} />
+      <Name variant="h2">{$hotel.name}</Name>
       <Info variant="h3">Tipos de acomodação:</Info>
       <Data variant="h6">Single e Double</Data>
       <Info variant="h3">Vagas disponíveis:</Info>
