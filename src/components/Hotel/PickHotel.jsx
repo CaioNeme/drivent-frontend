@@ -1,22 +1,18 @@
 import styled from 'styled-components';
 import { Typography } from '@mui/material';
 import HotelCard from './HotelCard.jsx';
+import { useState } from 'react';
 
 export default function PickHotel() {
+  const [selectedHotel, setSelectedHotel] = useState(0);
+
   return (
     <>
       <StyledTypography variant={'h6'}>Primeiro, escolha seu hotel</StyledTypography>
       <HotelCardContainer>
-        <HotelCard />
-        <HotelCard />
-        <HotelCard />
-        <HotelCard />
-        <HotelCard />
-        <HotelCard />
-        <HotelCard />
-        <HotelCard />
-        <HotelCard />
-        <HotelCard />
+        <HotelCard $hotel={{ id: 1 }} $selected={selectedHotel} $selectHotel={setSelectedHotel} />
+        <HotelCard $hotel={{ id: 2 }} $selected={selectedHotel} $selectHotel={setSelectedHotel} />
+        <HotelCard $hotel={{ id: 3 }} $selected={selectedHotel} $selectHotel={setSelectedHotel} />
       </HotelCardContainer>
     </>
   );
