@@ -1,6 +1,8 @@
-import { useContext, useState } from "react";
+import axios from "axios";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components"
+import useEnrollment from "../../../hooks/api/useEnrollment";
 
 export default function Payment() {
   const navigate = useNavigate();
@@ -12,6 +14,20 @@ export default function Payment() {
   const [selectModel2, setSelectModel2] = useState('#FFF');
   const [hotel, setHotel] = useState(false);
   const [remote, setRemote] = useState(false);
+  const [price, setPrice] = useState(0);
+  const [enrollment, setEnrollment] = useState("none");
+  const [model, setModel] = useState("flex");
+  const enrollmentContext = useEnrollment();
+
+  useEffect(() => {
+    if (!enrollmentContext.enrollment) {
+      setEnrollment("flex");
+      setModel("none");
+    } else {
+      setEnrollment("none");
+      setModel("block");
+    }
+  }, [enrollmentContext])
 
   function presencial() {
     if (selectModel1 === '#FFF') {
@@ -20,6 +36,7 @@ export default function Payment() {
       setOpen('block')
       setOpen2('none')
       setRemote(false);
+      setPrice(250);
     }
   }
   function online() {
@@ -30,6 +47,7 @@ export default function Payment() {
       setOpen2('block')
       setHotel(false);
       setRemote(true);
+      setPrice(100);
     }
   }
   function withHotel() {
@@ -38,6 +56,7 @@ export default function Payment() {
       setSelectHotel2('#FFEED2')
       setOpen2('block')
       setHotel(true);
+      setPrice(price + 350);
     }
   }
   function withOutHotel() {
@@ -46,12 +65,13 @@ export default function Payment() {
       setSelectHotel1('#FFEED2')
       setOpen2('block')
       setHotel(false);
+      setPrice(250);
     }
+
   }
   function submitForPayment() {
     const ticket = {
-      name: "TODO",
-      price: "TODO",
+      price: price,
       isRemote: remote,
       includesHotel: hotel,
     }
@@ -59,18 +79,18 @@ export default function Payment() {
   }
 
 
-  //TODO Montar a logica de verificação	de enrollment
-  //TODO colocar as variáveis de modalidades de ingresso
-  //TODO Soma de valores
+  //// Montar a logica de verificação	de enrollment
+  //// colocar as variáveis de modalidades de ingresso
+  ////  Soma de valores Feito
   //TODO Criar pagamento com o cartao de credito
   //TODO salvar dados do ingresso e navigate('/dashboard/hotel')
 
   return (
     <>
-      <NotEnrollment style={{ display: "none" }}>
+      <NotEnrollment style={{ display: enrollment }}>
         <p>Você precisa completar sua inscrição antes de prosseguir pra escolha de ingresso</p>
       </NotEnrollment>
-      <div>
+      <div style={{ display: model }}>
         <Title>
           <h1>Ingresso e pagamento</h1>
         </Title>
@@ -101,7 +121,7 @@ export default function Payment() {
           </Conteiner>
         </div>
         <div style={{ display: open2 }}>
-          <SubTitle>Fechado! O total ficou em R$ 600. Agora é só confirmar:</SubTitle>
+          <SubTitle>Fechado! O total ficou em R$ {price}. Agora é só confirmar:</SubTitle>
           <Button onClick={() => submitForPayment()}>RESERVAR INGRESSO</Button>
         </div>
       </div>
@@ -109,7 +129,7 @@ export default function Payment() {
   )
 }
 
-//! Styled Components
+//* Styled Components
 const Title = styled.div`
   height: 40px;
   width: 338px;

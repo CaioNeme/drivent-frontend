@@ -25,7 +25,7 @@ export function EventInfoProvider({ children }) {
 
   return (
     <EventInfoContext.Provider value={{ eventInfo: event, eventInfoError: eventError }}>
-      { children }
+      {children}
     </EventInfoContext.Provider>
   );
 }
