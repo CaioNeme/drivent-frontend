@@ -2,11 +2,13 @@ import styled from 'styled-components';
 import { Typography } from '@mui/material';
 import HotelCard from './HotelCard.jsx';
 import { useContext, useEffect, useState } from 'react';
-import { getHotels } from '../../services/hotelApi.js';
+import { getHotels, getHotelsWithRooms } from '../../services/hotelApi.js';
 import UserContext from '../../contexts/UserContext.jsx';
+import RoomCard from './RoomCard.jsx';
 
 export default function PickHotel() {
   const [hotelsList, setHotelsList] = useState([]);
+  const [rooms, setRooms] = useState([]);
   const [selectedHotel, setSelectedHotel] = useState(0);
   const { userData } = useContext(UserContext);
 
@@ -28,10 +30,17 @@ export default function PickHotel() {
               $hotel={hotel}
               $selected={selectedHotel}
               $selectHotel={setSelectedHotel}
+              $setPickRooms={setRooms}
             />
           );
         })}
       </HotelCardContainer>
+      <StyledTypography variant={'h6'}>Ótima pedida! Agora escolha seu quarto:</StyledTypography>
+      <RoomsContainer>
+        {rooms.map((room) => {
+          return <RoomCard key={'Room ' + room.id} />;
+        })}
+      </RoomsContainer>
     </>
   );
 }
@@ -51,6 +60,7 @@ const HotelCardContainer = styled.div`
   align-items: center;
 
   padding-bottom: 15px;
+  margin-bottom: 25px;
 
   > * {
     &:first-child {
@@ -62,4 +72,15 @@ const HotelCardContainer = styled.div`
       margin-right: 0px;
     }
   }
+`;
+
+const RoomsContainer = styled.div`
+  width: 860px;
+
+  margin-top: 15px;
+
+  display: grid;
+  grid-template-columns: repeat(4, 200px);
+  row-gap: 10px;
+  column-gap: 20px;
 `;

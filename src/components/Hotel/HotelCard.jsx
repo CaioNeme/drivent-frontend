@@ -1,17 +1,62 @@
 import styled from 'styled-components';
 import { Typography } from '@mui/material';
+import { getHotelsWithRooms } from '../../services/hotelApi.js';
+import { useContext, useEffect, useState } from 'react';
+import UserContext from '../../contexts/UserContext.jsx';
 
-export default function HotelCard({ $hotel, $selectHotel, $selected }) {
+export default function HotelCard({ $hotel, $selectHotel, $selected, $setPickRooms }) {
   const isSelected = $hotel.id === $selected ? 'true' : 'false';
+  const { userData } = useContext(UserContext);
+  const [rooms, setRooms] = useState([]);
+  const [accomodations, setAcommodations] = useState('');
 
-  console.log($hotel);
+  async function handleClick() {
+    $selectHotel($hotel.id);
+    $setPickRooms(rooms);
+  }
+
+  useEffect(() => {
+    (async () => {
+      let single = false;
+      let double = false;
+      let triple = false;
+      let aux = [];
+
+      const hotelWithRooms = await getHotelsWithRooms($hotel.id, userData.token);
+      setRooms(hotelWithRooms.Rooms);
+
+      hotelWithRooms.Rooms.forEach((room) => {
+        switch (room.capacity) {
+          case 1:
+            single = true;
+            break;
+          case 2:
+            double = true;
+            break;
+          case 3:
+            triple = true;
+            break;
+        }
+      });
+
+      if (single) aux.push('Single');
+      if (double) aux.push('Double');
+      if (triple) aux.push('Triple');
+
+      if (aux.length === 1) setAcommodations(aux[0]);
+      else if (aux.length > 0) {
+        const last = aux.pop();
+        setAcommodations(aux.join(', ') + ' e ' + last);
+      }
+    })();
+  }, []);
 
   return (
-    <Card $selected={isSelected} onClick={() => $selectHotel($hotel.id)}>
+    <Card $selected={isSelected} onClick={async () => {}}>
       <Photo src={$hotel.image} />
       <Name variant="h2">{$hotel.name}</Name>
       <Info variant="h3">Tipos de acomodação:</Info>
-      <Data variant="h6">Single e Double</Data>
+      <Data variant="h6">{accomodations}</Data>
       <Info variant="h3">Vagas disponíveis:</Info>
       <Data variant="h6">103</Data>
     </Card>
