@@ -10,7 +10,7 @@ export default function HotelCard({ $hotel, $selectHotel, $selected, $setPickRoo
   const [rooms, setRooms] = useState([]);
   const [accomodations, setAcommodations] = useState('');
 
-  async function handleClick() {
+  function handleClick() {
     $selectHotel($hotel.id);
     $setPickRooms(rooms);
   }
@@ -52,7 +52,7 @@ export default function HotelCard({ $hotel, $selectHotel, $selected, $setPickRoo
   }, []);
 
   return (
-    <Card $selected={isSelected} onClick={async () => {}}>
+    <Card $selected={isSelected} onClick={handleClick}>
       <Photo src={$hotel.image} />
       <Name variant="h2">{$hotel.name}</Name>
       <Info variant="h3">Tipos de acomodação:</Info>
