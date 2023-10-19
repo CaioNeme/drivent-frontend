@@ -9,6 +9,7 @@ export default function HotelCard({ $hotel, $selectHotel, $selected, $setPickRoo
   const { userData } = useContext(UserContext);
   const [rooms, setRooms] = useState([]);
   const [accomodations, setAcommodations] = useState('');
+  const [roomsAvailable, setRoomsAvailable] = useState(0);
 
   function handleClick() {
     $selectHotel($hotel.id);
@@ -21,11 +22,15 @@ export default function HotelCard({ $hotel, $selectHotel, $selected, $setPickRoo
       let double = false;
       let triple = false;
       let aux = [];
+      let availableCount = 0;
 
       const hotelWithRooms = await getHotelsWithRooms($hotel.id, userData.token);
       setRooms(hotelWithRooms.Rooms);
 
+      console.log(hotelWithRooms.Rooms);
+
       hotelWithRooms.Rooms.forEach((room) => {
+        availableCount += room.capacity - room.bookings;
         switch (room.capacity) {
           case 1:
             single = true;
@@ -38,6 +43,8 @@ export default function HotelCard({ $hotel, $selectHotel, $selected, $setPickRoo
             break;
         }
       });
+
+      setRoomsAvailable(availableCount);
 
       if (single) aux.push('Single');
       if (double) aux.push('Double');
@@ -58,7 +65,7 @@ export default function HotelCard({ $hotel, $selectHotel, $selected, $setPickRoo
       <Info variant="h3">Tipos de acomodação:</Info>
       <Data variant="h6">{accomodations}</Data>
       <Info variant="h3">Vagas disponíveis:</Info>
-      <Data variant="h6">103</Data>
+      <Data variant="h6">{roomsAvailable}</Data>
     </Card>
   );
 }
