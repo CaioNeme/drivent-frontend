@@ -38,7 +38,7 @@ export default function PickHotel() {
       <StyledTypography variant={'h6'}>Ótima pedida! Agora escolha seu quarto:</StyledTypography>
       <RoomsContainer>
         {rooms.map((room) => {
-          return <RoomCard key={'Room ' + room.id} />;
+          return <RoomCard key={'Room ' + room.id} $room={room}/>;
         })}
       </RoomsContainer>
     </>
