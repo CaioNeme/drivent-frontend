@@ -8,6 +8,10 @@ export default function Payment() {
   const navigate = useNavigate();
   const [open, setOpen] = useState("none");
   const [open2, setOpen2] = useState("none");
+  const [open3, setOpen3] = useState("block");
+  const [open4, setOpen4] = useState("none");
+  const [enrollment, setEnrollment] = useState("none");
+  const [model, setModel] = useState("flex");
   const [selectHotel1, setSelectHotel1] = useState('#FFF');
   const [selectHotel2, setSelectHotel2] = useState('#FFF');
   const [selectModel1, setSelectModel1] = useState('#FFF');
@@ -15,8 +19,6 @@ export default function Payment() {
   const [hotel, setHotel] = useState(false);
   const [remote, setRemote] = useState(false);
   const [price, setPrice] = useState(0);
-  const [enrollment, setEnrollment] = useState("none");
-  const [model, setModel] = useState("flex");
   const enrollmentContext = useEnrollment();
 
   useEffect(() => {
@@ -75,9 +77,13 @@ export default function Payment() {
       isRemote: remote,
       includesHotel: hotel,
     }
+    setOpen("none")
+    setOpen2("none")
+    setOpen3("none")
+    setOpen4("block")
+
     console.log(ticket)
   }
-
 
   //// Montar a logica de verificação	de enrollment
   //// colocar as variáveis de modalidades de ingresso
@@ -90,11 +96,11 @@ export default function Payment() {
       <NotEnrollment style={{ display: enrollment }}>
         <p>Você precisa completar sua inscrição antes de prosseguir pra escolha de ingresso</p>
       </NotEnrollment>
-      <div style={{ display: model }}>
+      <Model style={{ display: model }}>
         <Title>
           <h1>Ingresso e pagamento</h1>
         </Title>
-        <div>
+        <div style={{ display: open3 }}>
           <SubTitle>Primeiro, escolha sua modalidade de ingresso</SubTitle>
           <Conteiner>
             <Box style={{ backgroundColor: selectModel1 }} onClick={() => presencial()}>
@@ -124,7 +130,15 @@ export default function Payment() {
           <SubTitle>Fechado! O total ficou em R$ {price}. Agora é só confirmar:</SubTitle>
           <Button onClick={() => submitForPayment()}>RESERVAR INGRESSO</Button>
         </div>
-      </div>
+      </Model>
+      <Cartao style={{ display: open4 }}>
+        <p>Ingresso escolhido</p>
+        <div>
+          <h1>{remote ? 'Online' : 'Presencial'} + {hotel ? 'Com Hotel' : 'Sem hotel'}</h1>
+          <p>R${price}</p>
+        </div>
+      </Cartao>
+
     </>
   )
 }
@@ -230,5 +244,55 @@ const NotEnrollment = styled.div`
     font-style: normal;
     font-weight: 400;
     line-height: normal;
+  }
+`;
+const Model = styled.div`
+  display: block;
+`;
+const Cartao = styled.div`
+  p{
+    margin-top: 20px;
+
+    color: #8E8E8E;
+    font-family: Roboto;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+  }
+  div{
+    width: 290px;
+    height: 108px;
+    margin:17px;
+    flex-shrink: 0;
+
+    border-radius: 20px;
+    background: #FFEED2;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    h1{
+      color: #454545;
+      text-align: center;
+      font-family: Roboto;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: normal;
+    }
+    p{
+      margin-top: 8px;
+
+      color: #898989;
+      text-align: center;
+      font-family: Roboto;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: normal;
+    }
   }
 `;
