@@ -1,20 +1,21 @@
 import styled from 'styled-components';
 import { Typography } from '@mui/material';
 import HotelCard from './HotelCard.jsx';
-import { useContext, useEffect, useState } from 'react';
-import { getHotels, getHotelsWithRooms } from '../../services/hotelApi.js';
-import UserContext from '../../contexts/UserContext.jsx';
+import { useEffect, useState } from 'react';
+import { getHotels } from '../../services/hotelApi.js';
 import RoomCard from './RoomCard.jsx';
+import useToken from '../../hooks/useToken.js';
 
 export default function PickHotel() {
   const [hotelsList, setHotelsList] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [selectedHotel, setSelectedHotel] = useState(0);
-  const { userData } = useContext(UserContext);
+  const [selectedRoom, setSelectedRoom] = useState(0);
+  const token = useToken();
 
   useEffect(() => {
     (async () => {
-      const hotels = await getHotels(userData.token);
+      const hotels = await getHotels(token);
       setHotelsList(hotels);
     })();
   }, []);
@@ -38,7 +39,9 @@ export default function PickHotel() {
       <StyledTypography variant={'h6'}>Ótima pedida! Agora escolha seu quarto:</StyledTypography>
       <RoomsContainer>
         {rooms.map((room) => {
-          return <RoomCard key={'Room ' + room.id} $room={room}/>;
+          return (
+            <RoomCard key={'Room ' + room.id} $room={room} selected={selectedRoom} setSelected={setSelectedRoom} />
+          );
         })}
       </RoomsContainer>
     </>

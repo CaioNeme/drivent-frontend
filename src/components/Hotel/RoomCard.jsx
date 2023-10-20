@@ -4,23 +4,25 @@ import { Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 export default function RoomCard({ $room, selected, setSelected }) {
+  const isSelected = selected === $room.id ? true : false;
+  const isFull = $room.capacity - $room.bookings === 0 ? true : false;
+  const vaccancies = $room.capacity - $room.bookings;
   const [icons, setIcons] = useState([]);
 
   useEffect(() => {
-    const aux = [];
-    for (let i = 0; i < $room.capacity - $room.bookings; i++) {
-      if (i === $room.capacity - $room.bookings - 1 && selected === $room.id)
-        aux.push(<Occupied className="reserved" />);
-      else aux.push(<Vaccancy />);
+    const icons = [];
+
+    for (let i = 0; i < vaccancies; i++) {
+      if (i === vaccancies - 1 && isSelected) icons.push(<Occupied className="reserved" />);
+      else icons.push(<Vaccancy />);
     }
-    for (let i = 0; i < $room.bookings; i++) {
-      aux.push(<Occupied />);
-    }
-    setIcons(aux);
-  }, []);
+    for (let i = 0; i < $room.bookings; i++) icons.push(<Occupied />);
+
+    setIcons(icons);
+  }, [$room, selected]);
 
   return (
-    <Card disabled={$room.capacity - $room.bookings === 0 ? true : false}>
+    <Card className={isSelected && 'selected'} onClick={() => setSelected($room.id)} disabled={isFull || isSelected}>
       <Name>{$room.name}</Name>
       <IconsContainer>{icons}</IconsContainer>
     </Card>
@@ -41,6 +43,18 @@ const Card = styled.button`
   background-color: transparent;
   outline: none;
   border: 1px solid #cecece;
+
+  cursor: pointer;
+
+  &.selected:disabled {
+    background-color: #ffeed2 !important;
+    cursor: default;
+    transform: none;
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
 
   .reserved {
     color: #ff4791;

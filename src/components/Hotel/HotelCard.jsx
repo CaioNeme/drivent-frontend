@@ -1,12 +1,12 @@
 import styled from 'styled-components';
 import { Typography } from '@mui/material';
 import { getHotelsWithRooms } from '../../services/hotelApi.js';
-import { useContext, useEffect, useState } from 'react';
-import UserContext from '../../contexts/UserContext.jsx';
+import { useEffect, useState } from 'react';
+import useToken from '../../hooks/useToken.js';
 
 export default function HotelCard({ $hotel, $selectHotel, $selected, $setPickRooms }) {
   const isSelected = $hotel.id === $selected ? 'true' : 'false';
-  const { userData } = useContext(UserContext);
+  const token = useToken();
   const [rooms, setRooms] = useState([]);
   const [accomodations, setAcommodations] = useState('');
   const [roomsAvailable, setRoomsAvailable] = useState(0);
@@ -24,7 +24,7 @@ export default function HotelCard({ $hotel, $selectHotel, $selected, $setPickRoo
       let aux = [];
       let availableCount = 0;
 
-      const hotelWithRooms = await getHotelsWithRooms($hotel.id, userData.token);
+      const hotelWithRooms = await getHotelsWithRooms($hotel.id, token);
       setRooms(hotelWithRooms.Rooms);
 
       console.log(hotelWithRooms.Rooms);
