@@ -56,7 +56,7 @@ export default function HotelCard({ $hotel, $selectHotel, $selected, $setPickRoo
         setAcommodations(aux.join(', ') + ' e ' + last);
       }
     })();
-  }, []);
+  }, [$selected]);
 
   return (
     <Card $selected={isSelected} onClick={handleClick}>

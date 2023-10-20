@@ -19,7 +19,7 @@ export default function RoomCard({ $room, selected, setSelected }) {
     for (let i = 0; i < $room.bookings; i++) icons.push(<Occupied />);
 
     setIcons(icons);
-  }, [$room, selected]);
+  }, [selected]);
 
   return (
     <Card className={isSelected && 'selected'} onClick={() => setSelected($room.id)} disabled={isFull || isSelected}>
@@ -46,13 +46,18 @@ const Card = styled.button`
 
   cursor: pointer;
 
-  &.selected:disabled {
-    background-color: #ffeed2 !important;
+  &:disabled {
+    background-color: #e9e9e9;
+    color: #8c8c8c;
     cursor: default;
     transform: none;
   }
 
-  &:active {
+  &.selected:disabled {
+    background-color: #ffeed2 !important;
+  }
+
+  &:not(:disabled) {
     transform: scale(0.99);
   }
 

@@ -9,8 +9,8 @@ import useToken from '../../hooks/useToken.js';
 export default function PickHotel() {
   const [hotelsList, setHotelsList] = useState([]);
   const [rooms, setRooms] = useState([]);
-  const [selectedHotel, setSelectedHotel] = useState(0);
-  const [selectedRoom, setSelectedRoom] = useState(0);
+  const [selectedHotel, setSelectedHotel] = useState(-1);
+  const [selectedRoom, setSelectedRoom] = useState(-1);
   const token = useToken();
 
   useEffect(() => {
