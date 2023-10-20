@@ -16,46 +16,53 @@ export default function HotelCard({ $hotel, $selectHotel, $selected, $setPickRoo
     $setPickRooms(rooms);
   }
 
-  useEffect(() => {
-    (async () => {
-      let single = false;
-      let double = false;
-      let triple = false;
-      let aux = [];
-      let availableCount = 0;
+  async function getAndSetRooms() {
+    const hotelWithRooms = await getHotelsWithRooms($hotel.id, token);
+    setRooms(hotelWithRooms.Rooms);
+    return hotelWithRooms.Rooms;
+  }
 
-      const hotelWithRooms = await getHotelsWithRooms($hotel.id, token);
-      setRooms(hotelWithRooms.Rooms);
+  function countVaccanciesAndSet(receivedRooms) {
+    let single = false,
+      double = false,
+      triple = false,
+      accomodationString = [],
+      availableCount = 0;
 
-      console.log(hotelWithRooms.Rooms);
-
-      hotelWithRooms.Rooms.forEach((room) => {
-        availableCount += room.capacity - room.bookings;
-        switch (room.capacity) {
-          case 1:
-            single = true;
-            break;
-          case 2:
-            double = true;
-            break;
-          case 3:
-            triple = true;
-            break;
-        }
-      });
-
-      setRoomsAvailable(availableCount);
-
-      if (single) aux.push('Single');
-      if (double) aux.push('Double');
-      if (triple) aux.push('Triple');
-
-      if (aux.length === 1) setAcommodations(aux[0]);
-      else if (aux.length > 0) {
-        const last = aux.pop();
-        setAcommodations(aux.join(', ') + ' e ' + last);
+    receivedRooms.forEach((room) => {
+      availableCount += room.capacity - room.bookings;
+      switch (room.capacity) {
+        case 1:
+          single = true;
+          break;
+        case 2:
+          double = true;
+          break;
+        case 3:
+          triple = true;
+          break;
       }
-    })();
+    });
+
+    setRoomsAvailable(availableCount);
+
+    if (single) accomodationString.push('Single');
+    if (double) accomodationString.push('Double');
+    if (triple) accomodationString.push('Triple');
+
+    if (accomodationString.length === 1) setAcommodations(accomodationString[0]);
+    else if (accomodationString.length > 0) {
+      const last = accomodationString.pop();
+      setAcommodations(accomodationString.join(', ') + ' e ' + last);
+    }
+  }
+
+  useEffect(() => {
+    async function handleRooms() {
+      const resRooms = await getAndSetRooms();
+      countVaccanciesAndSet(resRooms);
+    }
+    handleRooms();
   }, [$selected]);
 
   return (
@@ -83,10 +90,10 @@ const Card = styled.div`
   cursor: ${({ $selected }) => ($selected === 'true' ? 'default' : 'pointer')};
   user-select: none;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background-color: ${({ $selected }) => ($selected === 'true' ? '#ffeed2' : '#e2e2e2')};
   }
-  &:active {
+  &:active:not(:disabled) {
     transform: scale(0.99);
   }
 `;
