@@ -4,7 +4,7 @@ import { getHotelsWithRooms } from '../../services/hotelApi.js';
 import { useEffect, useState } from 'react';
 import useToken from '../../hooks/useToken.js';
 
-export default function HotelCard({ $hotel, $selectHotel, $selected, $setPickRooms, scroll }) {
+export default function HotelCard({ $hotel, $selectHotel, $selected, $setPickRooms, $selectRoom }) {
   const [isSelected, setIsSelected] = useState(false);
   const token = useToken();
   const [rooms, setRooms] = useState([]);
@@ -12,6 +12,7 @@ export default function HotelCard({ $hotel, $selectHotel, $selected, $setPickRoo
   const [roomsAvailable, setRoomsAvailable] = useState(0);
 
   function handleClick() {
+    $selectRoom(-1);
     $selectHotel($hotel.id);
     $setPickRooms(rooms);
   }

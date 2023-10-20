@@ -46,6 +46,7 @@ export default function PickHotel() {
               $selected={selectedHotel}
               $selectHotel={setSelectedHotel}
               $setPickRooms={handleShowRooms}
+              $selectRoom={setSelectedRoom}
             />
           );
         })}
@@ -126,8 +127,14 @@ const BookRoomButton = styled.button`
 
   cursor: pointer;
 
+  box-shadow: 0px 2px 10px 0px #00000040;
+
   &:hover {
     background-color: #ccc;
+  }
+
+  &:active {
+    transform: scale(0.98);
   }
 
   > * {

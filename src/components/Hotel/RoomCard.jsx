@@ -56,6 +56,7 @@ const Card = styled.button`
 
   &.selected:disabled {
     background-color: #ffeed2 !important;
+    color: black;
   }
 
   &:not(:disabled) {
