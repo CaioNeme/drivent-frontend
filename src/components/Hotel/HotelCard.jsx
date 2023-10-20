@@ -1,26 +1,20 @@
 import styled from 'styled-components';
 import { Typography } from '@mui/material';
-import { getHotelsWithRooms } from '../../services/hotelApi.js';
 import { useEffect, useState } from 'react';
 import useToken from '../../hooks/useToken.js';
+import useHotelWithRooms from '../../hooks/api/useHotelWithRooms.js';
 
-export default function HotelCard({ $hotel, $selectHotel, $selected, $setPickRooms, $selectRoom }) {
+export default function HotelCard({ $hotel, $selectHotel, $selected, $selectRoom, $setPickRooms }) {
   const [isSelected, setIsSelected] = useState(false);
-  const token = useToken();
-  const [rooms, setRooms] = useState([]);
   const [accomodations, setAcommodations] = useState('');
   const [roomsAvailable, setRoomsAvailable] = useState(0);
+
+  const { hotelWithRooms } = useHotelWithRooms($hotel.id);
 
   function handleClick() {
     $selectRoom(-1);
     $selectHotel($hotel.id);
-    $setPickRooms(rooms);
-  }
-
-  async function getAndSetRooms() {
-    const hotelWithRooms = await getHotelsWithRooms($hotel.id, token);
-    setRooms(hotelWithRooms.Rooms);
-    return hotelWithRooms.Rooms;
+    $setPickRooms(hotelWithRooms.Rooms);
   }
 
   function countVaccanciesAndSet(receivedRooms) {
@@ -59,11 +53,10 @@ export default function HotelCard({ $hotel, $selectHotel, $selected, $setPickRoo
   }
 
   useEffect(() => {
-    async function handleRooms() {
-      const resRooms = await getAndSetRooms();
-      countVaccanciesAndSet(resRooms);
-    }
-    handleRooms();
+    if (hotelWithRooms) countVaccanciesAndSet(hotelWithRooms.Rooms);
+  }, [hotelWithRooms]);
+
+  useEffect(() => {
     if ($selected === $hotel.id) setIsSelected(true);
     else setIsSelected(false);
   }, [$selected]);

@@ -1,65 +1,54 @@
 import styled, { keyframes } from 'styled-components';
 import { Typography } from '@mui/material';
 import HotelCard from './HotelCard.jsx';
-import { useEffect, useRef, useState } from 'react';
-import { getHotels } from '../../services/hotelApi.js';
 import RoomCard from './RoomCard.jsx';
-import useToken from '../../hooks/useToken.js';
+import { useEffect, useState } from 'react';
+import useHotels from '../../hooks/api/useHotels.js';
+import useHotelWithRooms from '../../hooks/api/useHotelWithRooms.js';
 
 export default function PickHotel() {
-  const [hotelsList, setHotelsList] = useState([]);
+  const { hotels } = useHotels();
   const [rooms, setRooms] = useState([]);
   const [selectedHotel, setSelectedHotel] = useState(-1);
+
   const [selectedRoom, setSelectedRoom] = useState(-1);
   const [showRooms, setShowRooms] = useState(false);
-  const token = useToken();
-  const containerRef = useRef();
 
   function handleShowRooms(resRooms) {
     setRooms(resRooms);
     setShowRooms(true);
+    console.log(resRooms);
   }
-
-  function scrollToRooms() {
-    console.log(containerRef.current.scrollTop, containerRef.current.scrollHeight);
-    containerRef.current.scrollTop = containerRef.current.scrollHeight;
-  }
-
-  useEffect(() => {
-    async function getAndSetHotels() {
-      const hotels = await getHotels(token);
-      setHotelsList(hotels);
-    }
-    getAndSetHotels();
-  }, []);
 
   return (
-    <div ref={containerRef} style={{ paddingBottom: '150px' }}>
+    <FadeOutContainer>
+      <FadeOutDiv />
       <StyledTypography variant={'h6'}>Primeiro, escolha seu hotel</StyledTypography>
       <HotelCardContainer>
-        {hotelsList.map((hotel) => {
-          return (
-            <HotelCard
-              key={'Hotel ' + hotel.id}
-              scroll={scrollToRooms}
-              $hotel={hotel}
-              $selected={selectedHotel}
-              $selectHotel={setSelectedHotel}
-              $setPickRooms={handleShowRooms}
-              $selectRoom={setSelectedRoom}
-            />
-          );
-        })}
+        {hotels &&
+          hotels.map((hotel) => {
+            return (
+              <HotelCard
+                key={'Hotel ' + hotel.id}
+                $hotel={hotel}
+                $selected={selectedHotel}
+                $selectHotel={setSelectedHotel}
+                $setPickRooms={handleShowRooms}
+                $selectRoom={setSelectedRoom}
+              />
+            );
+          })}
       </HotelCardContainer>
       <FadeOutContainer show={showRooms.toString()}>
         <FadeOutDiv />
         <StyledTypography variant={'h6'}>Ótima pedida! Agora escolha seu quarto:</StyledTypography>
         <RoomsContainer>
-          {rooms.map((room) => {
-            return (
-              <RoomCard key={'Room ' + room.id} $room={room} selected={selectedRoom} setSelected={setSelectedRoom} />
-            );
-          })}
+          {showRooms &&
+            rooms.map((room) => {
+              return (
+                <RoomCard key={'Room ' + room.id} $room={room} selected={selectedRoom} setSelected={setSelectedRoom} />
+              );
+            })}
         </RoomsContainer>
       </FadeOutContainer>
       <FadeOutContainer show={selectedRoom != -1 ? 'true' : 'false'}>
@@ -68,7 +57,7 @@ export default function PickHotel() {
         </BookRoomButton>
         <FadeOutDiv />
       </FadeOutContainer>
-    </div>
+    </FadeOutContainer>
   );
 }
 
@@ -121,7 +110,7 @@ const FadeOutDiv = styled.div`
 `;
 
 const FadeOutContainer = styled.div`
-  display: ${({ show }) => (show === 'true' ? 'block' : 'none')};
+  display: ${({ show = 'true' }) => (show === 'true' ? 'block' : 'none')};
   position: relative;
 `;
 
@@ -157,6 +146,7 @@ const BookRoomButton = styled.button`
   border-radius: 4px;
   background-color: #e0e0e0;
   margin-top: 50px;
+  margin-bottom: 100px;
 
   cursor: pointer;
 
