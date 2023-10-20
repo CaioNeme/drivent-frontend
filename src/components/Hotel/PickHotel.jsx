@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { Typography } from '@mui/material';
 import HotelCard from './HotelCard.jsx';
 import { useEffect, useRef, useState } from 'react';
@@ -34,7 +34,7 @@ export default function PickHotel() {
   }, []);
 
   return (
-    <div ref={containerRef}>
+    <div ref={containerRef} style={{ paddingBottom: '150px' }}>
       <StyledTypography variant={'h6'}>Primeiro, escolha seu hotel</StyledTypography>
       <HotelCardContainer>
         {hotelsList.map((hotel) => {
@@ -51,7 +51,8 @@ export default function PickHotel() {
           );
         })}
       </HotelCardContainer>
-      <div style={{ visibility: showRooms ? 'visible' : 'hidden' }}>
+      <FadeOutContainer show={showRooms.toString()}>
+        <FadeOutDiv />
         <StyledTypography variant={'h6'}>Ótima pedida! Agora escolha seu quarto:</StyledTypography>
         <RoomsContainer>
           {rooms.map((room) => {
@@ -60,12 +61,13 @@ export default function PickHotel() {
             );
           })}
         </RoomsContainer>
-      </div>
-      <div style={{ visibility: selectedRoom != -1 ? 'visible' : 'hidden' }}>
+      </FadeOutContainer>
+      <FadeOutContainer show={selectedRoom != -1 ? 'true' : 'false'}>
         <BookRoomButton>
           <StyledTypography variant={'h6'}>RESERVAR QUARTO</StyledTypography>
         </BookRoomButton>
-      </div>
+        <FadeOutDiv />
+      </FadeOutContainer>
     </div>
   );
 }
@@ -99,6 +101,30 @@ const HotelCardContainer = styled.div`
   }
 `;
 
+const fadeout = keyframes`
+  from{
+    background-color: white;
+  }to{
+    background-color: transparent;
+  }
+`;
+
+const FadeOutDiv = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  animation: ${fadeout} 1s ease-in-out;
+  z-index: 2;
+  pointer-events: none;
+`;
+
+const FadeOutContainer = styled.div`
+  display: ${({ show }) => (show === 'true' ? 'block' : 'none')};
+  position: relative;
+`;
+
 const RoomsContainer = styled.div`
   width: 860px;
 
@@ -108,6 +134,14 @@ const RoomsContainer = styled.div`
   grid-template-columns: repeat(4, 200px);
   row-gap: 10px;
   column-gap: 20px;
+`;
+
+const shadow = keyframes`
+  from{
+    box-shadow: none;
+  }to{
+    box-shadow: 0px 2px 10px 0px #00000040; 
+  }
 `;
 
 const BookRoomButton = styled.button`
@@ -123,11 +157,10 @@ const BookRoomButton = styled.button`
   border-radius: 4px;
   background-color: #e0e0e0;
   margin-top: 50px;
-  margin-bottom: 150px;
 
   cursor: pointer;
 
-  box-shadow: 0px 2px 10px 0px #00000040;
+  animation: ${shadow} 1s ease-in-out forwards;
 
   &:hover {
     background-color: #ccc;
