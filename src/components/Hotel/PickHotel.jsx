@@ -36,14 +36,18 @@ export default function PickHotel() {
           );
         })}
       </HotelCardContainer>
-      <StyledTypography variant={'h6'}>Ótima pedida! Agora escolha seu quarto:</StyledTypography>
-      <RoomsContainer>
-        {rooms.map((room) => {
-          return (
-            <RoomCard key={'Room ' + room.id} $room={room} selected={selectedRoom} setSelected={setSelectedRoom} />
-          );
-        })}
-      </RoomsContainer>
+      {rooms.length > 0 && (
+        <>
+          <StyledTypography variant={'h6'}>Ótima pedida! Agora escolha seu quarto:</StyledTypography>
+          <RoomsContainer>
+            {rooms.map((room) => {
+              return (
+                <RoomCard key={'Room ' + room.id} $room={room} selected={selectedRoom} setSelected={setSelectedRoom} />
+              );
+            })}
+          </RoomsContainer>
+        </>
+      )}
     </>
   );
 }
