@@ -4,8 +4,8 @@ import { getHotelsWithRooms } from '../../services/hotelApi.js';
 import { useEffect, useState } from 'react';
 import useToken from '../../hooks/useToken.js';
 
-export default function HotelCard({ $hotel, $selectHotel, $selected, $setPickRooms }) {
-  const isSelected = $hotel.id === $selected ? 'true' : 'false';
+export default function HotelCard({ $hotel, $selectHotel, $selected, $setPickRooms, scroll }) {
+  const [isSelected, setIsSelected] = useState(false);
   const token = useToken();
   const [rooms, setRooms] = useState([]);
   const [accomodations, setAcommodations] = useState('');
@@ -63,10 +63,12 @@ export default function HotelCard({ $hotel, $selectHotel, $selected, $setPickRoo
       countVaccanciesAndSet(resRooms);
     }
     handleRooms();
+    if ($selected === $hotel.id) setIsSelected(true);
+    else setIsSelected(false);
   }, [$selected]);
 
   return (
-    <Card $selected={isSelected} onClick={handleClick}>
+    <Card $selected={isSelected} onClick={handleClick} disabled={isSelected}>
       <Photo src={$hotel.image} />
       <Name variant="h2">{$hotel.name}</Name>
       <Info variant="h3">Tipos de acomodação:</Info>
@@ -77,21 +79,32 @@ export default function HotelCard({ $hotel, $selectHotel, $selected, $setPickRoo
   );
 }
 
-const Card = styled.div`
+const Card = styled.button`
   width: 196px;
   height: 264px;
 
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  border: none;
+
   border-radius: 10px;
-  background-color: ${({ $selected }) => ($selected === 'true' ? '#ffeed2' : '#ebebeb')};
+  background-color: #ebebeb;
 
   margin: 0px 10px 0px 10px;
   padding: 15px;
 
-  cursor: ${({ $selected }) => ($selected === 'true' ? 'default' : 'pointer')};
+  cursor: pointer;
   user-select: none;
 
+  &:disabled {
+    background-color: #ffeed2;
+    cursor: default;
+  }
+
   &:hover:not(:disabled) {
-    background-color: ${({ $selected }) => ($selected === 'true' ? '#ffeed2' : '#e2e2e2')};
+    background-color: #ccc;
   }
   &:active:not(:disabled) {
     transform: scale(0.99);
@@ -99,9 +112,10 @@ const Card = styled.div`
 `;
 
 const Photo = styled.img`
-  width: 168px;
+  width: 100%;
   height: 109px;
   border-radius: 5px;
+  object-fit: cover;
 `;
 
 const Name = styled(Typography)`

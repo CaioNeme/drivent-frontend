@@ -13,10 +13,11 @@ export default function RoomCard({ $room, selected, setSelected }) {
     const icons = [];
 
     for (let i = 0; i < vaccancies; i++) {
-      if (i === vaccancies - 1 && isSelected) icons.push(<Occupied className="reserved" />);
-      else icons.push(<Vaccancy />);
+      if (i === vaccancies - 1 && isSelected)
+        icons.push(<Occupied key={'Reserved ' + $room.id} className="reserved" />);
+      else icons.push(<Vaccancy key={'Vaccancy ' + $room.id + i} />);
     }
-    for (let i = 0; i < $room.bookings; i++) icons.push(<Occupied />);
+    for (let i = 0; i < $room.bookings; i++) icons.push(<Occupied key={'Occupied ' + $room.id + i} />);
 
     setIcons(icons);
   }, [selected]);
