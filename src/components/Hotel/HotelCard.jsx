@@ -8,11 +8,11 @@ export default function HotelCard({ $hotel, $selectHotel, $selected, $setSelecte
   const [accomodations, setAcommodations] = useState('');
   const [roomsAvailable, setRoomsAvailable] = useState(0);
 
-  const { hotelWithRooms } = useHotelWithRooms($hotel.id);
+  const { hotelWithRooms, getHotelWithRooms } = useHotelWithRooms();
 
   function handleClick() {
-    $setSelectedRoom($selectedRoom, -1);
-    $selectHotel($hotel.id);
+    $setSelectedRoom({});
+    $selectHotel($hotel);
     $displayRooms(hotelWithRooms.Rooms);
   }
 
@@ -24,7 +24,7 @@ export default function HotelCard({ $hotel, $selectHotel, $selected, $setSelecte
       availableCount = 0;
 
     receivedRooms.forEach((room) => {
-      if ($selectedRoom === room.id) $selectHotel($hotel.id);
+      if ($selectedRoom) if ($selectedRoom.id === room.id) $selectHotel($hotel);
       availableCount += room.capacity - room.bookings;
       switch (room.capacity) {
         case 1:
@@ -53,12 +53,19 @@ export default function HotelCard({ $hotel, $selectHotel, $selected, $setSelecte
   }
 
   useEffect(() => {
+    (async () => {
+      await getHotelWithRooms($hotel.id);
+    })();
+  }, []);
+
+  useEffect(() => {
     if (hotelWithRooms) countVaccanciesAndSet(hotelWithRooms.Rooms);
   }, [hotelWithRooms]);
 
   useEffect(() => {
-    if ($selected === $hotel.id) setIsSelected(true);
-    else setIsSelected(false);
+    if ($selected)
+      if ($selected.id === $hotel.id) setIsSelected(true);
+      else setIsSelected(false);
   }, [$selected]);
 
   return (

@@ -3,27 +3,44 @@ import { BsPerson, BsPersonFill } from 'react-icons/bs';
 import { Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
-export default function RoomCard({ $room, selected, setSelected }) {
-  const isSelected = selected === $room.id ? true : false;
-  const isFull = $room.capacity - $room.bookings === 0 ? true : false;
+export default function RoomCard({ $room, selected, setSelected, bookedRoom }) {
+  const isSelected = selected.id === $room.id ? true : false;
+
+  const [isFull, setIsFull] = useState($room.capacity - $room.bookings === 0 ? true : false);
+
   const vaccancies = $room.capacity - $room.bookings;
   const [icons, setIcons] = useState([]);
 
   useEffect(() => {
     const icons = [];
-
-    for (let i = 0; i < vaccancies; i++) {
-      if (i === vaccancies - 1 && isSelected)
-        icons.push(<Occupied key={'Reserved ' + $room.id} className="reserved" />);
-      else icons.push(<Vaccancy key={'Vaccancy ' + $room.id + i} />);
+    if (bookedRoom.id === $room.id) {
+      for (let i = 0; i < vaccancies + 1; i++) {
+        setIsFull(false);
+        if (i === vaccancies && isSelected)
+          icons.push(<Occupied key={'Reserved ' + $room.id} className="reserved" />);
+        else icons.push(<Vaccancy key={'Vaccancy ' + $room.id + i} />);
+      }
+      for (let i = 0; i < $room.bookings - 1; i++) icons.push(<Occupied key={'Occupied ' + $room.id + i} />);
+    } else {
+      for (let i = 0; i < vaccancies; i++) {
+        if (i === vaccancies - 1 && isSelected)
+          icons.push(<Occupied key={'Reserved ' + $room.id} className="reserved" />);
+        else icons.push(<Vaccancy key={'Vaccancy ' + $room.id + i} />);
+      }
+      for (let i = 0; i < $room.bookings; i++) icons.push(<Occupied key={'Occupied ' + $room.id + i} />);
     }
-    for (let i = 0; i < $room.bookings; i++) icons.push(<Occupied key={'Occupied ' + $room.id + i} />);
 
     setIcons(icons);
   }, [selected]);
 
   return (
-    <Card className={isSelected && 'selected'} onClick={() => setSelected($room.id)} disabled={isFull || isSelected}>
+    <Card
+      className={isSelected && 'selected'}
+      onClick={() => {
+        setSelected($room);
+      }}
+      disabled={isFull || isSelected}
+    >
       <Name>{$room.name}</Name>
       <IconsContainer>{icons}</IconsContainer>
     </Card>

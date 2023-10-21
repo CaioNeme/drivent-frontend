@@ -8,17 +8,21 @@ import useBooking from '../../hooks/api/useBooking.js';
 import { toast } from 'react-toastify';
 import useSaveBooking from '../../hooks/api/useSaveBooking.js';
 import useEditBooking from '../../hooks/api/useEditBooking.js';
+import useHotelWithRooms from '../../hooks/api/useHotelWithRooms.js';
+import BookedHotelCard from './BookedHotelCard.jsx';
 
 export default function PickHotel() {
-  const { hotels, getHotels, hotelsError } = useHotels();
-  const { booking, bookingLoading, getBooking, bookingError } = useBooking();
-  const { saveBooking, saveBokingLoading, saveBookingError } = useSaveBooking();
-  const { editBooking, editBokingLoading, editBookingError } = useEditBooking();
+  const { hotels, getHotels, hotelsLoading, hotelsError } = useHotels();
+  const { booking, getBooking } = useBooking();
+  const { saveBooking, saveBookingError } = useSaveBooking();
+  const { editBooking, editBookingError } = useEditBooking();
+  const { hotelWithRooms, getHotelWithRooms } = useHotelWithRooms();
 
   const [displayedRooms, setDisplayedRooms] = useState([]);
   const [displayBooking, setDisplayBooking] = useState(false);
-  const [selectedHotel, setSelectedHotel] = useState(-1);
-  const [selectedRoom, setSelectedRoom] = useState(-1);
+  const [selectedHotel, setSelectedHotel] = useState({});
+  const [selectedRoom, setSelectedRoom] = useState({});
+  const [bookedRoom, setBookedRoom] = useState({});
 
   function handleHotelsError() {
     if (hotelsError) toast('Não foi possível receber os hotéis!');
@@ -29,19 +33,37 @@ export default function PickHotel() {
   }
 
   async function handleSubmit() {
-    if (booking) await editBooking({ roomId: selectedRoom }, booking.id);
-    else await saveBooking({ roomId: selectedRoom });
-    if (!saveBookingError && !editBookingError) setDisplayBooking(true);
+    console.log(selectedRoom);
+    if (booking) await editBooking({ roomId: selectedRoom.id }, booking.id);
+    else await saveBooking({ roomId: selectedRoom.id });
+    if (!saveBookingError && !editBookingError) {
+      await getBooking();
+      setDisplayBooking(true);
+    }
   }
 
   useEffect(handleBookingError, [saveBookingError, editBookingError]);
   useEffect(handleHotelsError, [hotelsError]);
   useEffect(() => {
-    if (booking) {
-      setSelectedRoom(booking.Room.id);
-      setDisplayBooking(true);
-    } else setDisplayBooking(false);
+    (async () => {
+      if (booking) {
+        await getHotelWithRooms(booking.Room.hotelId);
+        setDisplayBooking(true);
+      } else setDisplayBooking(false);
+    })();
   }, [booking]);
+  useEffect(() => {
+    if (hotelWithRooms) {
+      setSelectedHotel(hotelWithRooms);
+      setDisplayedRooms(hotelWithRooms.Rooms);
+      hotelWithRooms.Rooms.forEach((room) => {
+        if (room.id === booking.Room.id) {
+          setBookedRoom(room);
+          setSelectedRoom(room);
+        }
+      });
+    }
+  }, [hotelWithRooms]);
   useEffect(() => {
     if (location.pathname === '/dashboard/hotel') {
       (async () => {
@@ -53,11 +75,15 @@ export default function PickHotel() {
 
   if (displayBooking)
     return (
-      <BookRoomButton onClick={() => setDisplayBooking(false)}>
-        <StyledTypography variant={'h6'}>EDITAR QUARTO</StyledTypography>
-      </BookRoomButton>
+      <>
+        <StyledTypography variant={'h6'}>Você já escolheu seu quarto:</StyledTypography>
+        <BookedHotelCard $hotel={selectedHotel} $room={bookedRoom} />
+        <BookRoomButton onClick={() => setDisplayBooking(false)}>
+          <StyledTypography variant={'h6'}>TROCAR DE QUARTO</StyledTypography>
+        </BookRoomButton>
+      </>
     );
-  else
+  else if (!hotelsLoading)
     return (
       <FadeOutContainer>
         <FadeOutDiv />
@@ -90,12 +116,14 @@ export default function PickHotel() {
                     $room={room}
                     selected={selectedRoom}
                     setSelected={setSelectedRoom}
+                    bookedRoom={bookedRoom}
+                    setBookedRoom={setBookedRoom}
                   />
                 );
               })}
           </RoomsContainer>
         </FadeOutContainer>
-        <FadeOutContainer show={selectedRoom != -1 ? 'true' : 'false'}>
+        <FadeOutContainer show={selectedRoom ? 'true' : 'false'}>
           <BookRoomButton onClick={async () => await handleSubmit()}>
             <StyledTypography variant={'h6'}>RESERVAR QUARTO</StyledTypography>
           </BookRoomButton>
