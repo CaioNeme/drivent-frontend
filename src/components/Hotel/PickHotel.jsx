@@ -1,66 +1,108 @@
 import styled, { keyframes } from 'styled-components';
 import { Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
 import HotelCard from './HotelCard.jsx';
 import RoomCard from './RoomCard.jsx';
-import { useEffect, useState } from 'react';
 import useHotels from '../../hooks/api/useHotels.js';
-import useHotelWithRooms from '../../hooks/api/useHotelWithRooms.js';
+import useBooking from '../../hooks/api/useBooking.js';
+import { toast } from 'react-toastify';
+import useSaveBooking from '../../hooks/api/useSaveBooking.js';
+import useEditBooking from '../../hooks/api/useEditBooking.js';
 
 export default function PickHotel() {
-  const { hotels, getHotels } = useHotels();
+  const { hotels, getHotels, hotelsError } = useHotels();
+  const { booking, bookingLoading, getBooking, bookingError } = useBooking();
+  const { saveBooking, saveBokingLoading, saveBookingError } = useSaveBooking();
+  const { editBooking, editBokingLoading, editBookingError } = useEditBooking();
 
   const [displayedRooms, setDisplayedRooms] = useState([]);
+  const [displayBooking, setDisplayBooking] = useState(false);
   const [selectedHotel, setSelectedHotel] = useState(-1);
-
   const [selectedRoom, setSelectedRoom] = useState(-1);
 
+  function handleHotelsError() {
+    if (hotelsError) toast('Não foi possível receber os hotéis!');
+  }
+
+  function handleBookingError() {
+    if (saveBookingError || editBookingError) toast('Não foi possível salvar a reserva!');
+  }
+
+  async function handleSubmit() {
+    if (booking) await editBooking({ roomId: selectedRoom }, booking.id);
+    else await saveBooking({ roomId: selectedRoom });
+    if (!saveBookingError && !editBookingError) setDisplayBooking(true);
+  }
+
+  useEffect(handleBookingError, [saveBookingError, editBookingError]);
+  useEffect(handleHotelsError, [hotelsError]);
+  useEffect(() => {
+    if (booking) {
+      setSelectedRoom(booking.Room.id);
+      setDisplayBooking(true);
+    } else setDisplayBooking(false);
+  }, [booking]);
   useEffect(() => {
     if (location.pathname === '/dashboard/hotel') {
       (async () => {
+        await getBooking();
         await getHotels();
       })();
     }
   }, [location.pathname]);
 
-  return (
-    <FadeOutContainer>
-      <FadeOutDiv />
-      <StyledTypography variant={'h6'}>Primeiro, escolha seu hotel</StyledTypography>
-      <HotelCardContainer>
-        {hotels &&
-          hotels.map((hotel) => {
-            return (
-              <HotelCard
-                key={'Hotel ' + hotel.id}
-                $hotel={hotel}
-                $selected={selectedHotel}
-                $selectHotel={setSelectedHotel}
-                $displayRooms={setDisplayedRooms}
-                $selectRoom={setSelectedRoom}
-              />
-            );
-          })}
-      </HotelCardContainer>
-      <FadeOutContainer show={displayedRooms.length > 0 ? 'true' : 'false'}>
+  if (displayBooking)
+    return (
+      <BookRoomButton onClick={() => setDisplayBooking(false)}>
+        <StyledTypography variant={'h6'}>EDITAR QUARTO</StyledTypography>
+      </BookRoomButton>
+    );
+  else
+    return (
+      <FadeOutContainer>
         <FadeOutDiv />
-        <StyledTypography variant={'h6'}>Ótima pedida! Agora escolha seu quarto:</StyledTypography>
-        <RoomsContainer>
-          {displayedRooms.length > 0 &&
-            displayedRooms.map((room) => {
+        <StyledTypography variant={'h6'}>Primeiro, escolha seu hotel</StyledTypography>
+        <HotelCardContainer>
+          {hotels &&
+            hotels.map((hotel) => {
               return (
-                <RoomCard key={'Room ' + room.id} $room={room} selected={selectedRoom} setSelected={setSelectedRoom} />
+                <HotelCard
+                  key={'Hotel ' + hotel.id}
+                  $hotel={hotel}
+                  $selected={selectedHotel}
+                  $selectHotel={setSelectedHotel}
+                  $displayRooms={setDisplayedRooms}
+                  $setSelectedRoom={setSelectedRoom}
+                  $selectedRoom={selectedRoom}
+                />
               );
             })}
-        </RoomsContainer>
+        </HotelCardContainer>
+        <FadeOutContainer show={displayedRooms.length > 0 ? 'true' : 'false'}>
+          <FadeOutDiv />
+          <StyledTypography variant={'h6'}>Ótima pedida! Agora escolha seu quarto:</StyledTypography>
+          <RoomsContainer>
+            {displayedRooms.length > 0 &&
+              displayedRooms.map((room) => {
+                return (
+                  <RoomCard
+                    key={'Room ' + room.id}
+                    $room={room}
+                    selected={selectedRoom}
+                    setSelected={setSelectedRoom}
+                  />
+                );
+              })}
+          </RoomsContainer>
+        </FadeOutContainer>
+        <FadeOutContainer show={selectedRoom != -1 ? 'true' : 'false'}>
+          <BookRoomButton onClick={async () => await handleSubmit()}>
+            <StyledTypography variant={'h6'}>RESERVAR QUARTO</StyledTypography>
+          </BookRoomButton>
+          <FadeOutDiv />
+        </FadeOutContainer>
       </FadeOutContainer>
-      <FadeOutContainer show={selectedRoom != -1 ? 'true' : 'false'}>
-        <BookRoomButton>
-          <StyledTypography variant={'h6'}>RESERVAR QUARTO</StyledTypography>
-        </BookRoomButton>
-        <FadeOutDiv />
-      </FadeOutContainer>
-    </FadeOutContainer>
-  );
+    );
 }
 
 const StyledTypography = styled(Typography)`
@@ -160,6 +202,12 @@ const BookRoomButton = styled.button`
 
   &:active {
     transform: scale(0.98);
+  }
+
+  &:disabled {
+    background-color: #ccc;
+    transform: none;
+    cursor: default;
   }
 
   > * {

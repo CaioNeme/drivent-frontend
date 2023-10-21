@@ -3,7 +3,7 @@ import { Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import useHotelWithRooms from '../../hooks/api/useHotelWithRooms.js';
 
-export default function HotelCard({ $hotel, $selectHotel, $selected, $selectRoom, $displayRooms }) {
+export default function HotelCard({ $hotel, $selectHotel, $selected, $setSelectedRoom, $selectedRoom, $displayRooms }) {
   const [isSelected, setIsSelected] = useState(false);
   const [accomodations, setAcommodations] = useState('');
   const [roomsAvailable, setRoomsAvailable] = useState(0);
@@ -11,7 +11,7 @@ export default function HotelCard({ $hotel, $selectHotel, $selected, $selectRoom
   const { hotelWithRooms } = useHotelWithRooms($hotel.id);
 
   function handleClick() {
-    $selectRoom(-1);
+    $setSelectedRoom($selectedRoom, -1);
     $selectHotel($hotel.id);
     $displayRooms(hotelWithRooms.Rooms);
   }
@@ -24,6 +24,7 @@ export default function HotelCard({ $hotel, $selectHotel, $selected, $selectRoom
       availableCount = 0;
 
     receivedRooms.forEach((room) => {
+      if ($selectedRoom === room.id) $selectHotel($hotel.id);
       availableCount += room.capacity - room.bookings;
       switch (room.capacity) {
         case 1:
