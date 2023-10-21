@@ -7,18 +7,20 @@ import useHotels from '../../hooks/api/useHotels.js';
 import useHotelWithRooms from '../../hooks/api/useHotelWithRooms.js';
 
 export default function PickHotel() {
-  const { hotels } = useHotels();
-  const [rooms, setRooms] = useState([]);
+  const { hotels, getHotels } = useHotels();
+
+  const [displayedRooms, setDisplayedRooms] = useState([]);
   const [selectedHotel, setSelectedHotel] = useState(-1);
 
   const [selectedRoom, setSelectedRoom] = useState(-1);
-  const [showRooms, setShowRooms] = useState(false);
 
-  function handleShowRooms(resRooms) {
-    setRooms(resRooms);
-    setShowRooms(true);
-    console.log(resRooms);
-  }
+  useEffect(() => {
+    if (location.pathname === '/dashboard/hotel') {
+      (async () => {
+        await getHotels();
+      })();
+    }
+  }, [location.pathname]);
 
   return (
     <FadeOutContainer>
@@ -33,18 +35,18 @@ export default function PickHotel() {
                 $hotel={hotel}
                 $selected={selectedHotel}
                 $selectHotel={setSelectedHotel}
-                $setPickRooms={handleShowRooms}
+                $displayRooms={setDisplayedRooms}
                 $selectRoom={setSelectedRoom}
               />
             );
           })}
       </HotelCardContainer>
-      <FadeOutContainer show={showRooms.toString()}>
+      <FadeOutContainer show={displayedRooms.length > 0 ? 'true' : 'false'}>
         <FadeOutDiv />
         <StyledTypography variant={'h6'}>Ótima pedida! Agora escolha seu quarto:</StyledTypography>
         <RoomsContainer>
-          {showRooms &&
-            rooms.map((room) => {
+          {displayedRooms.length > 0 &&
+            displayedRooms.map((room) => {
               return (
                 <RoomCard key={'Room ' + room.id} $room={room} selected={selectedRoom} setSelected={setSelectedRoom} />
               );

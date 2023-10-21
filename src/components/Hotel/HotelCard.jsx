@@ -1,10 +1,9 @@
 import styled from 'styled-components';
 import { Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import useToken from '../../hooks/useToken.js';
 import useHotelWithRooms from '../../hooks/api/useHotelWithRooms.js';
 
-export default function HotelCard({ $hotel, $selectHotel, $selected, $selectRoom, $setPickRooms }) {
+export default function HotelCard({ $hotel, $selectHotel, $selected, $selectRoom, $displayRooms }) {
   const [isSelected, setIsSelected] = useState(false);
   const [accomodations, setAcommodations] = useState('');
   const [roomsAvailable, setRoomsAvailable] = useState(0);
@@ -14,7 +13,7 @@ export default function HotelCard({ $hotel, $selectHotel, $selected, $selectRoom
   function handleClick() {
     $selectRoom(-1);
     $selectHotel($hotel.id);
-    $setPickRooms(hotelWithRooms.Rooms);
+    $displayRooms(hotelWithRooms.Rooms);
   }
 
   function countVaccanciesAndSet(receivedRooms) {

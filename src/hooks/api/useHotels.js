@@ -7,15 +7,15 @@ export default function useHotels() {
   const token = useToken();
   const {
     data: hotels,
-    loading: hotelLoading,
-    error: hotelError,
-    act: getHotel,
-  } = useAsync(() => hotelApi.getHotels(token));
+    loading: hotelsLoading,
+    error: hotelsError,
+    act: getHotels,
+  } = useAsync(() => hotelApi.getHotels(token), false);
 
   return {
     hotels,
-    hotelLoading,
-    hotelError,
-    getHotel,
+    hotelsLoading,
+    hotelsError,
+    getHotels,
   };
 }

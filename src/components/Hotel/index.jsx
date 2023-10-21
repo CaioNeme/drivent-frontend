@@ -1,40 +1,49 @@
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { useEffect } from 'react';
+import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import Typography from '@mui/material/Typography';
-import { getUserTicket } from '../../services/ticketApi.js';
-import UserContext from '../../contexts/UserContext.jsx';
 import ErrorMsg from './ErrorMsg.jsx';
 import PickHotel from './PickHotel.jsx';
+import useTicket from '../../hooks/api/useTicket.js';
 
 export default function HotelIndex() {
-  const [loading, setLoading] = useState(true);
-  const [ticket, setTicket] = useState(undefined);
+  const { ticket, ticketLoading, getTicket, ticketError } = useTicket();
+
   const [includesHotel, setIncludesHotel] = useState(false);
   const [isPaid, setIsPaid] = useState(false);
-  const { userData } = useContext(UserContext);
+
+  function handleError() {
+    if (ticketError) toast('Não foi possível verificar seu ticket!');
+  }
+
+  function handleTicket() {
+    if (ticket) {
+      const type = ticket.TicketType;
+
+      if (type.includesHotel && !type.isRemote) setIncludesHotel(true);
+      else setIncludesHotel(false);
+      if (ticket.status === 'PAID') setIsPaid(true);
+      else setIsPaid(false);
+    }
+  }
+
+  useEffect(handleTicket, [ticket]);
+  useEffect(handleError, [ticketError]);
 
   useEffect(() => {
-    (async () => {
-      setLoading(true);
-      try {
-        const response = await getUserTicket(userData.token);
-        setTicket(response);
-        const { TicketType } = response;
-        if (TicketType.includesHotel && !TicketType.isRemote) setIncludesHotel(true);
-        if (response.status === 'PAID') setIsPaid(true);
-      } catch (err) {
-        if (err.status === 404) setIncludesHotel(false);
-      }
-      setLoading(false);
-    })();
-  }, []);
+    if (location.pathname === '/dashboard/hotel') {
+      (async () => {
+        await getTicket();
+      })();
+    }
+  }, [location.pathname]);
 
   return (
     <>
       <StyledTypography variant="h4">Escolha de hotel e quarto</StyledTypography>
-      {!loading && <ErrorMsg hotel={includesHotel} paid={isPaid} />}
-      {!loading && includesHotel && isPaid && <PickHotel />}
+      {!ticketLoading && <ErrorMsg hotel={includesHotel} paid={isPaid} />}
+      {!ticketLoading && includesHotel && isPaid && <PickHotel />}
     </>
   );
 }
