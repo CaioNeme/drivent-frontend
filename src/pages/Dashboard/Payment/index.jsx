@@ -1,11 +1,11 @@
-import axios from "axios";
-import { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import styled from "styled-components"
 import useEnrollment from "../../../hooks/api/useEnrollment";
+import useToken from "../../../hooks/useToken";
+import useTicketTypes from "../../../hooks/api/useTickets";
 
 export default function Payment() {
-  const navigate = useNavigate();
+  const token = useToken();
   const [open, setOpen] = useState("none");
   const [open2, setOpen2] = useState("none");
   const [open3, setOpen3] = useState("block");
@@ -20,6 +20,9 @@ export default function Payment() {
   const [remote, setRemote] = useState(false);
   const [price, setPrice] = useState(0);
   const enrollmentContext = useEnrollment();
+  let ticketId = 0;
+  const { tickets } = useTicketTypes();
+  // console.log(tickets);
 
   useEffect(() => {
     if (!enrollmentContext.enrollment) {
@@ -77,11 +80,21 @@ export default function Payment() {
       isRemote: remote,
       includesHotel: hotel,
     }
+
+    if (ticket.isRemote) {
+      ticketId = tickets[0].id
+    } else if (ticket.includesHotel) {
+      ticketId = tickets[2].id
+    } else {
+      ticketId = tickets[1].id
+    }
+
     setOpen("none")
     setOpen2("none")
     setOpen3("none")
     setOpen4("block")
 
+    console.log(ticketId)
     console.log(ticket)
   }
 
