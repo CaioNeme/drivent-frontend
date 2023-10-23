@@ -8,7 +8,10 @@ import { toast } from 'react-toastify';
 /* import useTicketTypes from '../../../hooks/api/useTicketTypes'; */
 import PaymentContext from '../../../contexts/PaymentContext';
 import { useTicketType } from '../../../contexts/TicketTypeContext';
+import Cards from 'react-credit-cards-2';
+import 'react-credit-cards-2/dist/es/styles-compiled.css';
 import axios from 'axios';
+import SuccessCheckout from './SuccessCheckout';
 
 export default function Payment() {
   const token = useToken();
@@ -26,11 +29,23 @@ export default function Payment() {
   const [remote, setRemote] = useState(false);
   const [price, setPrice] = useState(0);
   const enrollmentContext = useEnrollment();
-  const { ticketType, setTicketType, ticketId, setTicketId } = useTicketType();
-  const { setPriceTicket, setHotelTicket, setTypeTicket } = useContext(PaymentContext);
+  const { setTicketType, ticketId, setTicketId } = useTicketType();
+
+  const [state, setState] = useState({
+    number: '',
+    expiry: '',
+    cvc: '',
+    name: '',
+    focus: '',
+  });
+
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardName, setCardName] = useState('');
+  const [cardCVC, setCardCVC] = useState('');
+  const [cardExpiry, setCardExpiry] = useState('');
+  const [payment, setPayment] = useState(false);
 
   axios.defaults.baseURL = `${import.meta.env.VITE_API_URL}`;
-  // console.log(tickets);
 
   useEffect(() => {
     if (!enrollmentContext.enrollment) {
@@ -82,7 +97,7 @@ export default function Payment() {
     }
   }
 
-  const submitTicket = async () => {
+  const submitForPayment = async () => {
     const ticket = {
       price: price,
       isRemote: remote,
@@ -120,29 +135,6 @@ export default function Payment() {
       console.log(error);
     }
   };
-  function submitForPayment() {
-    const ticket = {
-      price: price,
-      isRemote: remote,
-      includesHotel: hotel,
-    };
-
-    /*     if (ticket.isRemote) {
-      ticketId = tickets[0].id;
-    } else if (ticket.includesHotel) {
-      ticketId = tickets[2].id;
-    } else {
-      ticketId = tickets[1].id;
-    }
- */
-    setOpen('none');
-    setOpen2('none');
-    setOpen3('none');
-    setOpen4('block');
-
-    console.log(ticketId);
-    console.log(ticket);
-  }
 
   //// Montar a logica de verificação	de enrollment
   //// colocar as variáveis de modalidades de ingresso
@@ -150,6 +142,44 @@ export default function Payment() {
   //TODO Criar pagamento com o cartao de credito
   //TODO salvar dados do ingresso e navigate('/dashboard/hotel')
 
+  const handleInputChange = (evt) => {
+    const { name, value } = evt.target;
+
+    setState((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleInputFocus = (evt) => {
+    setState((prev) => ({ ...prev, focus: evt.target.name }));
+  };
+
+  async function handleProccess(e) {
+    e.preventDefault();
+    const body = {
+      ticketId: ticketId,
+      cardData: {
+        issuer: cardName,
+        number: cardNumber,
+        name: enrollment,
+        expirationDate: cardExpiry,
+        cvv: cardCVC,
+      },
+    };
+
+    console.log(body);
+    try {
+      const response = await axios.post('/payments/process', body, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(response.data);
+      setPayment(true);
+      toast('Pagamento realizado com sucesso');
+    } catch (error) {
+      toast('Falha no pagamento, verifique os dados');
+      console.log(error);
+    }
+  }
   return (
     <>
       <NotEnrollment style={{ display: enrollment }}>
@@ -187,7 +217,7 @@ export default function Payment() {
         </div>
         <div style={{ display: open2 }}>
           <SubTitle>Fechado! O total ficou em R$ {price}. Agora é só confirmar:</SubTitle>
-          <Button onClick={submitTicket}>RESERVAR INGRESSO</Button>
+          <Button onClick={submitForPayment}>RESERVAR INGRESSO</Button>
         </div>
       </Model>
       <Cartao style={{ display: open4 }}>
@@ -198,7 +228,96 @@ export default function Payment() {
           </h1>
           <p>R${price}</p>
         </div>
+        <h2>Pagamento</h2>
       </Cartao>
+      {payment !== true ? (
+        <ContainerMain style={{ display: open4 }}>
+          <CreditCard>
+            <Cards
+              number={state.number}
+              expiry={state.expiry}
+              cvc={state.cvc}
+              name={state.name}
+              focused={state.focus}
+            />
+            <form onSubmit={handleProccess}>
+              <div className="form-group">
+                <input
+                  type="number"
+                  name="number"
+                  placeholder="Card Number"
+                  className="form-control"
+                  maxLength="16"
+                  pattern="[\d| ]{16}"
+                  required
+                  value={state.number}
+                  onChange={(e) => {
+                    handleInputChange(e);
+                    setCardNumber(e.target.value);
+                  }}
+                  onFocus={handleInputFocus}
+                />
+                <small>E.g.: 49..., 51..., 36..., 37...</small>
+              </div>
+              <div className="form-group">
+                <input
+                  type="text"
+                  name="name"
+                  className="form-control"
+                  placeholder="Name"
+                  required
+                  value={state.name}
+                  onChange={(e) => {
+                    handleInputChange(e);
+                    setCardName(e.target.value);
+                  }}
+                  onFocus={handleInputFocus}
+                />
+              </div>
+              <div className="row">
+                <div className="col-6">
+                  <input
+                    type="tel"
+                    name="expiry"
+                    placeholder="Valid thru"
+                    className="form-expiry"
+                    pattern="\d\d/\d\d"
+                    maxLength="5"
+                    required
+                    value={state.expiry}
+                    onChange={(e) => {
+                      handleInputChange(e);
+                      setCardExpiry(e.target.value);
+                    }}
+                    onFocus={handleInputFocus}
+                  />
+
+                  <input
+                    type="tel"
+                    name="cvc"
+                    className="form-control"
+                    placeholder="CVC"
+                    maxLength="3"
+                    pattern="\d{3,4}"
+                    required
+                    value={state.cvc}
+                    onChange={(e) => {
+                      handleInputChange(e);
+                      setCardCVC(e.target.value);
+                    }}
+                    onFocus={handleInputFocus}
+                  />
+                </div>
+              </div>
+            </form>
+          </CreditCard>
+          <button type="submit" onClick={handleProccess}>
+            FINALIZAR PAGAMENTO
+          </button>
+        </ContainerMain>
+      ) : (
+        <SuccessCheckout style={{ display: open4 }} />
+      )}
     </>
   );
 }
@@ -351,6 +470,65 @@ const Cartao = styled.div`
       font-style: normal;
       font-weight: 400;
       line-height: normal;
+    }
+  }
+`;
+
+const ContainerMain = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  h2 {
+    font-family: Roboto;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 23.44px;
+    color: #8e8e8e;
+  }
+  button {
+    width: 182px;
+    height: 37px;
+    border-radius: 4px;
+    margin-top: 20px;
+    border: none;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+  }
+`;
+
+const CreditCard = styled.div`
+  display: flex;
+  box-sizing: border-box;
+  form {
+    input {
+      width: 300px;
+      height: 35px;
+      border-radius: 7px;
+      border-color: grey;
+    }
+    small {
+      color: #8e8e8e;
+      font-size: 12px;
+    }
+    margin-left: 30px;
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 8px;
+    }
+    .row {
+      display: flex;
+      width: 300px;
+    }
+    .col-6 {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      .form-expiry {
+        width: 65%;
+      }
+      .form-control {
+        width: 30%;
+      }
     }
   }
 `;

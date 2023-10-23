@@ -3,21 +3,19 @@ import styled from 'styled-components';
 import Cards from 'react-credit-cards-2';
 import 'react-credit-cards-2/dist/es/styles-compiled.css';
 import React, { useContext, useState } from 'react';
-import TicketCard from './TicketCard';
-import SuccessCheckout from './SuccessCheckout';
+import TicketCard from '../../pages/Dashboard/Payment/TicketCard';
+import SuccessCheckout from '../../pages/Dashboard/Payment/SuccessCheckout';
 import useToken from '../../hooks/useToken';
 import { toast } from 'react-toastify';
 import axios from 'axios';
-import UserContext from '../../contexts/UserContext';
-import { useTicketType } from '../../contexts/TicketTypeContext';
-import EnrollmentContext from '../../contexts/EnrollmentContext';
+import { useTicketType } from '../../../contexts/TicketTypeContext';
+import useEnrollment from '../../../hooks/api/useEnrollment';
 
 axios.defaults.baseURL = `${import.meta.env.VITE_API_URL}`;
 
 export default function CheckoutPayment() {
-  const { EnrollmentData } = useContext(EnrollmentContext);
+  const enrollmentContext = useEnrollment();
 
-  console.log(EnrollmentData, 'enrollment');
   const [state, setState] = useState({
     number: '',
     expiry: '',
@@ -25,7 +23,7 @@ export default function CheckoutPayment() {
     name: '',
     focus: '',
   });
-  const { userData } = useContext(UserContext);
+
   const [cardNumber, setCardNumber] = useState('');
   const [cardName, setCardName] = useState('');
   const [cardCVC, setCardCVC] = useState('');
@@ -99,7 +97,7 @@ export default function CheckoutPayment() {
                     name="number"
                     placeholder="Card Number"
                     className="form-control"
-                    maxlength="16"
+                    maxLength="16"
                     pattern="[\d| ]{16}"
                     required
                     value={state.number}
