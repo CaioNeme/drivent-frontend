@@ -1,23 +1,14 @@
-import React from "react";
-import { StyledBox, Value, Label } from "./boxOptions";
+import React from 'react';
+import { StyledBox, Value, Label } from './boxOptions';
 
-export default function AccommodationOptions({
-  selectedOption,
-  onOptionSelect,
-}) {
+export default function AccommodationOptions({ selectedOption, onOptionSelect }) {
   return (
-    <div style={{ display: "flex" }}>
-      <StyledBox
-        onClick={() => toggleOption("Option1")}
-        selected={selectedOption === "Option1"}
-      >
+    <div style={{ display: 'flex' }}>
+      <StyledBox onClick={() => toggleOption('Option1')} selected={selectedOption === 'Option1'}>
         <Value>Com Hotel</Value>
         <Label>+ R$350</Label>
       </StyledBox>
-      <StyledBox
-        onClick={() => toggleOption("Option2")}
-        selected={selectedOption === "Option2"}
-      >
+      <StyledBox onClick={() => toggleOption('Option2')} selected={selectedOption === 'Option2'}>
         <Value>Sem Hotel</Value>
         <Label>+ R$0</Label>
       </StyledBox>

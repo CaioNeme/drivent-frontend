@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export const BoxesContainer = styled.div`
   display: flex;
@@ -37,7 +37,6 @@ export const Label = styled.div`
   font-size: 14px;
   color: #cecece;
 `;
-
 
 export const StyledBoxCard = styled.div`
   width: 290px;
