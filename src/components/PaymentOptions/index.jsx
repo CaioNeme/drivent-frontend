@@ -7,7 +7,7 @@ import {
   EnrollmentErrorMessage,
   CenteredContent,
 } from './titleSubTitle';
-import { BoxesContainer, StyledBox, Value, Label, StyledBoxCard } from './boxOptions';
+import { BoxesContainer, StyledBox, Value, Label } from './boxOptions';
 import { ReserveButton } from './reserveButton';
 import useTicketType, { useTicket } from '../../hooks/api/useTicket';
 import AccommodationOptions from './AccommodationOptions';

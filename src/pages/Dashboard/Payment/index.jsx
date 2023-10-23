@@ -1,8 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import useEnrollment from '../../../hooks/api/useEnrollment';
 import useToken from '../../../hooks/useToken';
-import useTicketTypes from '../../../hooks/api/useTickets';
+//import useTicketTypes from '../../../hooks/api/useTickets';
+/* import useTicket from '../../../hooks/api/useTicket'; */
+import { toast } from 'react-toastify';
+/* import useTicketTypes from '../../../hooks/api/useTicketTypes'; */
+import PaymentContext from '../../../contexts/PaymentContext';
+import { useTicketType } from '../../../contexts/TicketTypeContext';
+import axios from 'axios';
 
 export default function Payment() {
   const token = useToken();
@@ -20,8 +26,10 @@ export default function Payment() {
   const [remote, setRemote] = useState(false);
   const [price, setPrice] = useState(0);
   const enrollmentContext = useEnrollment();
-  let ticketId = 0;
-  const { tickets } = useTicketTypes();
+  const { ticketType, setTicketType, ticketId, setTicketId } = useTicketType();
+  const { setPriceTicket, setHotelTicket, setTypeTicket } = useContext(PaymentContext);
+
+  axios.defaults.baseURL = `${import.meta.env.VITE_API_URL}`;
   // console.log(tickets);
 
   useEffect(() => {
@@ -73,6 +81,45 @@ export default function Payment() {
       setPrice(250);
     }
   }
+
+  const submitTicket = async () => {
+    const ticket = {
+      price: price,
+      isRemote: remote,
+      includesHotel: hotel,
+    };
+    let id;
+    if (ticket.isRemote) {
+      id = 1;
+      setTicketType(1);
+    } else if (ticket.includesHotel) {
+      setTicketType(3);
+      id = 3;
+    } else {
+      setTicketType(2);
+      id = 2;
+    }
+    try {
+      const response = await axios.post(
+        '/tickets',
+        { ticketTypeId: id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast('Ticket criado');
+      setOpen('none');
+      setOpen2('none');
+      setOpen3('none');
+      setOpen4('block');
+      setTicketId(response.data.id);
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   function submitForPayment() {
     const ticket = {
       price: price,
@@ -80,14 +127,14 @@ export default function Payment() {
       includesHotel: hotel,
     };
 
-    if (ticket.isRemote) {
+    /*     if (ticket.isRemote) {
       ticketId = tickets[0].id;
     } else if (ticket.includesHotel) {
       ticketId = tickets[2].id;
     } else {
       ticketId = tickets[1].id;
     }
-
+ */
     setOpen('none');
     setOpen2('none');
     setOpen3('none');
@@ -140,7 +187,7 @@ export default function Payment() {
         </div>
         <div style={{ display: open2 }}>
           <SubTitle>Fechado! O total ficou em R$ {price}. Agora é só confirmar:</SubTitle>
-          <Button onClick={() => submitForPayment()}>RESERVAR INGRESSO</Button>
+          <Button onClick={submitTicket}>RESERVAR INGRESSO</Button>
         </div>
       </Model>
       <Cartao style={{ display: open4 }}>
