@@ -21,21 +21,33 @@ const ContainerSuccess = styled.div`
   margin-top: 10px;
   display: flex;
   ion-icon {
-    color: green;
+    color: #36B853;
     font-size: 40px;
+
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+
+    margin-right: 8px;
   }
-  h3 {
-    font-size: 15px;
-    font-family: Roboto;
-    color: #454545;
-    font-weight: 350;
-    line-height: 23.44px;
+  div{
+    margin-top: 5px;
+    h3 {
+      color: #454545;
+      font-family: Roboto;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: normal;
+    }
+    span {
+      color: #454545;
+      font-family: Roboto;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 700;
+      line-height: normal;
+    }
   }
-  span {
-    font-size: 20px;
-    font-family: Roboto;
-    font-size: 20px;
-    font-weight: 400;
-    line-height: 23.44px;
-  }
+  
 `;
