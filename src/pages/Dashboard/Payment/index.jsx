@@ -1,16 +1,13 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import useEnrollment from '../../../hooks/api/useEnrollment';
 import useToken from '../../../hooks/useToken';
-//import useTicketTypes from '../../../hooks/api/useTickets';
-/* import useTicket from '../../../hooks/api/useTicket'; */
 import { toast } from 'react-toastify';
-/* import useTicketTypes from '../../../hooks/api/useTicketTypes'; */
-import PaymentContext from '../../../contexts/PaymentContext';
 import { useTicketType } from '../../../contexts/TicketTypeContext';
 import Cards from 'react-credit-cards-2';
 import 'react-credit-cards-2/dist/es/styles-compiled.css';
 import axios from 'axios';
+import useTicket from '../../../hooks/api/useTicket.js';
 import SuccessCheckout from './SuccessCheckout';
 
 export default function Payment() {
@@ -30,7 +27,12 @@ export default function Payment() {
   const [price, setPrice] = useState(0);
   const enrollmentContext = useEnrollment();
   const { setTicketType, ticketId, setTicketId } = useTicketType();
-
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardName, setCardName] = useState('');
+  const [cardCVC, setCardCVC] = useState('');
+  const [cardExpiry, setCardExpiry] = useState('');
+  const [payment, setPayment] = useState(false);
+  const { ticket } = useTicket();
   const [state, setState] = useState({
     number: '',
     expiry: '',
@@ -38,12 +40,6 @@ export default function Payment() {
     name: '',
     focus: '',
   });
-
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardName, setCardName] = useState('');
-  const [cardCVC, setCardCVC] = useState('');
-  const [cardExpiry, setCardExpiry] = useState('');
-  const [payment, setPayment] = useState(false);
 
   axios.defaults.baseURL = `${import.meta.env.VITE_API_URL}`;
 
@@ -56,6 +52,15 @@ export default function Payment() {
       setModel('block');
     }
   }, [enrollmentContext]);
+
+  useEffect(() => {
+    if (ticket) {
+      setOpen3('none');
+      setOpen4('block');
+      setPayment(true);
+
+    }
+  }, [ticket, enrollmentContext])
 
   function presencial() {
     if (selectModel1 === '#FFF') {
@@ -135,12 +140,6 @@ export default function Payment() {
       console.log(error);
     }
   };
-
-  //// Montar a logica de verificação	de enrollment
-  //// colocar as variáveis de modalidades de ingresso
-  ////  Soma de valores Feito
-  //TODO Criar pagamento com o cartao de credito
-  //TODO salvar dados do ingresso e navigate('/dashboard/hotel')
 
   const handleInputChange = (evt) => {
     const { name, value } = evt.target;
@@ -224,9 +223,9 @@ export default function Payment() {
         <p>Ingresso escolhido</p>
         <div>
           <h1>
-            {remote ? 'Online' : 'Presencial'} + {hotel ? 'Com Hotel' : 'Sem hotel'}
+            {!ticket ? remote ? 'Online' : 'Presencial' : ticket.TicketType.isRemote ? 'Online' : 'Presencial'} + {!ticket ? hotel ? 'Com Hotel' : 'Sem hotel' : ticket.TicketType.includesHotel ? 'Com Hotel' : 'Sem hotel'}
           </h1>
-          <p>R${price}</p>
+          <p>R${!ticket ? price : ticket.TicketType.price}</p>
         </div>
         <h2>Pagamento</h2>
       </Cartao>
@@ -472,6 +471,15 @@ const Cartao = styled.div`
       line-height: normal;
     }
   }
+  
+  h2{
+      color: #8E8E8E;
+      font-family: Roboto;
+      font-size: 20px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: normal;
+    }
 `;
 
 const ContainerMain = styled.div`
