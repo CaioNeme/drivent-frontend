@@ -2,13 +2,23 @@ import { useEffect } from "react";
 import { useState } from "react";
 import styled from "styled-components";
 import useTicket from '../../../hooks/api/useTicket.js';
+import useDays from "../../../hooks/api/useDays.js";
+import dayjs from "dayjs";
+import Horarios from "./Horarios.jsx";
 
 export default function Activities() {
+  const { ticket } = useTicket();
+  const { days } = useDays();
   const [warning, setWarning] = useState('none');
   const [verifyPayment, setVerifyPayment] = useState('none');
   const [verifyModel, setVerifyModel] = useState('none');
   const [mainConteiner, setMainConteiner] = useState('none');
-  const { ticket } = useTicket();
+  const [selectDay1, setSelectDay1] = useState('#E0E0E0');
+  const [selectDay2, setSelectDay2] = useState('#E0E0E0');
+  const [selectDay3, setSelectDay3] = useState('#E0E0E0');
+  const [text, setText] = useState('block');
+  const [showHorarios, setShowHorarios] = useState('none');
+  const [day, setDay] = useState(0);
 
   useEffect(() => {
     if (!ticket) {
@@ -25,7 +35,32 @@ export default function Activities() {
       setVerifyModel('none');
       setMainConteiner('block');
     }
-  }, [ticket])
+  }, [ticket, days, day]);
+
+  function day1() {
+    setSelectDay1("#FFD37D")
+    setSelectDay2("#E0E0E0")
+    setSelectDay3("#E0E0E0")
+    setText("none")
+    setShowHorarios("flex")
+    setDay(1)
+  }
+  function day2() {
+    setSelectDay1("#E0E0E0")
+    setSelectDay2("#FFD37D")
+    setSelectDay3("#E0E0E0")
+    setText("none")
+    setShowHorarios("flex")
+    setDay(2)
+  }
+  function day3() {
+    setSelectDay1("#E0E0E0")
+    setSelectDay2("#E0E0E0")
+    setSelectDay3("#FFD37D")
+    setText("none")
+    setShowHorarios("flex")
+    setDay(3)
+  }
 
   return (
     <>
@@ -35,96 +70,14 @@ export default function Activities() {
         <p style={{ display: verifyModel }}>Sua modalidade de ingresso não necessita escolher atividade. Você terá acesso a todas as atividades.</p>
       </Warning>
       <MainConteiner style={{ display: mainConteiner }}>
-        <h1>Primeiro, filtre pelo dia do evento:</h1>
+        <h1 style={{ display: text }}>Primeiro, filtre pelo dia do evento:</h1>
         <Dias>
-          <div><p>Domingo, 22/10</p></div>
-          <div><p>Segunda, 23/10</p></div>
-          <div><p>Terça, 24/10</p></div>
+          <div style={{ backgroundColor: selectDay1 }} onClick={day1}><p>{days ? dayjs(days[0].date).format('dddd') + ", " + dayjs(days[0].date).format('DD/MM') : ""}</p></div>
+          <div style={{ backgroundColor: selectDay2 }} onClick={day2}><p>{days ? dayjs(days[1].date).format('dddd') + ", " + dayjs(days[1].date).format('DD/MM') : ""}</p></div>
+          <div style={{ backgroundColor: selectDay3 }} onClick={day3}><p>{days ? dayjs(days[2].date).format('dddd') + ", " + dayjs(days[2].date).format('DD/MM') : ""}</p></div>
         </Dias>
-        <HorariosConteiner>
-          <Horarios>
-            <h1>Auditório Principal</h1>
-            <div>
-              <Horario>
-                <div>
-                  <h2>Minecraft: montando o PC ideal</h2>
-                  <h3>09:00 - 10:00</h3>
-                </div>
-                <Traco />
-                <Vagas>
-                  <ion-icon name="close-circle-outline"></ion-icon>
-                  <p>esgotado</p>
-                </Vagas>
-              </Horario>
-              <Horario>
-                <div>
-                  <h2>Minecraft: montando o PC ideal</h2>
-                  <h3>09:00 - 10:00</h3>
-                </div>
-                <Traco />
-                <Vagas>
-                  <ion-icon name="enter-outline"></ion-icon>
-                  <p>27 vagas</p>
-                </Vagas>
-              </Horario>
-            </div>
-          </Horarios>
-
-          <Horarios>
-            <h1>Auditório Principal</h1>
-            <div>
-              <Horario>
-                <div>
-                  <h2>Minecraft: montando o PC ideal</h2>
-                  <h3>09:00 - 10:00</h3>
-                </div>
-                <Traco />
-                <Vagas>
-                  <ion-icon name="close-circle-outline"></ion-icon>
-                  <p>esgotado</p>
-                </Vagas>
-              </Horario>
-              <Horario>
-                <div>
-                  <h2>Minecraft: montando o PC ideal</h2>
-                  <h3>09:00 - 10:00</h3>
-                </div>
-                <Traco />
-                <Vagas>
-                  <ion-icon name="enter-outline"></ion-icon>
-                  <p>27 vagas</p>
-                </Vagas>
-              </Horario>
-            </div>
-          </Horarios>
-
-          <Horarios>
-            <h1>Auditório Principal</h1>
-            <div>
-              <Horario>
-                <div>
-                  <h2>Minecraft: montando o PC ideal</h2>
-                  <h3>09:00 - 10:00</h3>
-                </div>
-                <Traco />
-                <Vagas>
-                  <ion-icon name="close-circle-outline"></ion-icon>
-                  <p>esgotado</p>
-                </Vagas>
-              </Horario>
-              <Horario>
-                <div>
-                  <h2>Minecraft: montando o PC ideal</h2>
-                  <h3>09:00 - 10:00</h3>
-                </div>
-                <Traco />
-                <Vagas>
-                  <ion-icon name="enter-outline"></ion-icon>
-                  <p>27 vagas</p>
-                </Vagas>
-              </Horario>
-            </div>
-          </Horarios>
+        <HorariosConteiner style={{ display: showHorarios }}>
+          {day === 1 ? <Horarios day={1} /> : day === 2 ? <Horarios day={2} /> : day === 3 ? <Horarios day={3} /> : "Erro interno por favor tente novamente mais tarde"}
         </HorariosConteiner>
       </MainConteiner>
     </>
@@ -212,69 +165,5 @@ const HorariosConteiner = styled.div`
       font-weight: 400;
       line-height: normal;
     }
-  }
-`;
-const Horarios = styled.div`
-  border: 1px solid #D7D7D7;
-  height: 400px;
-  box-sizing: border-box;
-`;
-const Horario = styled.div`
-  border: 1px solid #D7D7D7;
-  width: 290px;
-  height: 70px;
-  margin:10px;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-
-  border-radius: 5px;
-  background: #F1F1F1;
-  div{
-    h2{
-      color: #343434;
-      font-family: Roboto;
-      font-size: 12px;
-      font-style: normal;
-      font-weight: 700;
-      line-height: normal;
-    }
-    h3{
-      color: #343434;
-      font-family: Roboto;
-      font-size: 12px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: normal;
-    }
-  }
-`;
-const Traco = styled.div`
-  width: 1px;
-  height: 60px;
-  background: #CFCFCF;
-`;
-const Vagas = styled.div`
-  flex-shrink: 0;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  p{
-    color: #078632;
-    font-family: Roboto;
-    font-size: 9px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-  }
-
-  ion-icon{
-    display:inline-block;
-    font-size:20px;
-    color: #078632;
   }
 `;
