@@ -1,20 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import dayjs from 'dayjs';
 import styled from 'styled-components';
-import useActivities from '../../../hooks/api/useActivities';
 
 export default function Horario(props) {
-  const { day, place } = props;
-  const { activities } = useActivities(day, place);
-  console.log(activities)
-
-  useEffect(() => {
-
-  }, [day]);
+  const { activities } = props;
 
   return (
     <>
-      {activities ? activities.map((activity) =>
+      {activities.map((activity) =>
         <Conteiner key={activity.id}>
           <span>
             <h2>{activity.eventName}</h2>
@@ -26,7 +19,7 @@ export default function Horario(props) {
             <ion-icon name="enter-outline" />
             <p>{activity.availableSlots}</p>
           </Vagas>
-        </Conteiner>) : ""}
+        </Conteiner>)}
     </>
   )
 }

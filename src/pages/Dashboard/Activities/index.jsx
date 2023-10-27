@@ -5,10 +5,12 @@ import useTicket from '../../../hooks/api/useTicket.js';
 import useDays from "../../../hooks/api/useDays.js";
 import dayjs from "dayjs";
 import Horarios from "./Horarios.jsx";
+import useActivities from "../../../hooks/api/useActivities.js";
 
 export default function Activities() {
   const { ticket } = useTicket();
   const { days } = useDays();
+  const { activities } = useActivities();
   const [warning, setWarning] = useState('none');
   const [verifyPayment, setVerifyPayment] = useState('none');
   const [verifyModel, setVerifyModel] = useState('none');
@@ -19,6 +21,7 @@ export default function Activities() {
   const [text, setText] = useState('block');
   const [showHorarios, setShowHorarios] = useState('none');
   const [day, setDay] = useState(0);
+  const [atividades, setAtividades] = useState(activities);
 
   useEffect(() => {
     if (!ticket) {
@@ -35,7 +38,8 @@ export default function Activities() {
       setVerifyModel('none');
       setMainConteiner('block');
     }
-  }, [ticket, days, day]);
+    setAtividades(activities)
+  }, [ticket, days, day, activities]);
 
   function day1() {
     setSelectDay1("#FFD37D")
@@ -77,7 +81,14 @@ export default function Activities() {
           <div style={{ backgroundColor: selectDay3 }} onClick={day3}><p>{days ? dayjs(days[2].date).format('dddd') + ", " + dayjs(days[2].date).format('DD/MM') : ""}</p></div>
         </Dias>
         <HorariosConteiner style={{ display: showHorarios }}>
-          {day === 1 ? <Horarios day={1} /> : day === 2 ? <Horarios day={2} /> : day === 3 ? <Horarios day={3} /> : "Erro interno por favor tente novamente mais tarde"}
+          {
+            day === 1 ? <Horarios activities={atividades.day1} day={1} />
+              :
+              day === 2 ? <Horarios activities={atividades.day2} day={2} />
+                :
+                day === 3 ? <Horarios activities={atividades.day3} day={3} />
+                  :
+                  "Erro interno por favor tente novamente mais tarde"}
         </HorariosConteiner>
       </MainConteiner>
     </>

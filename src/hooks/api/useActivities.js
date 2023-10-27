@@ -2,7 +2,7 @@ import useAsync from '../useAsync';
 import useToken from '../useToken';
 import * as activitiesApi from '../../services/activitiesApi';
 
-export default function useActivities(dayId, placeId) {
+export default function useActivities() {
   const token = useToken();
 
   const {
@@ -10,7 +10,7 @@ export default function useActivities(dayId, placeId) {
     loading: activitiesLoading,
     error: activitiesError,
     act: getActivities,
-  } = useAsync(() => activitiesApi.getActivities(token, dayId, placeId));
+  } = useAsync(() => activitiesApi.getActivities(token));
 
   return {
     activities,

@@ -1,7 +1,7 @@
 import api from './api.js';
 
-export async function getActivities(token, dayId, placeId) {
-  const response = await api.get(`/activities/${dayId}/${placeId}`, {
+export async function getActivities(token) {
+  const response = await api.get(`/activities/`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
