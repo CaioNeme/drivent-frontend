@@ -109,7 +109,7 @@ const Warning = styled.div`
   align-items: center;
 
   width: 100%;
-  height: 100%;
+  height: 90%;
   p{
     width:462px;
     height:42px;
