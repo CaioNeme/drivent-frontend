@@ -24,19 +24,19 @@ export default function (props) {
           <Horarios >
             <h1>{places[0].name}</h1>
             <div>
-              <Horario activities={atividades1} />
+              <Horario activities={atividades1} day={day} />
             </div>
           </Horarios>
           <Horarios>
             <h1>{places[1].name}</h1>
             <div>
-              <Horario activities={atividades2} />
+              <Horario activities={atividades2} day={day} />
             </div>
           </Horarios >
           <Horarios>
             <h1>{places[2].name}</h1>
             <div>
-              <Horario activities={atividades3} />
+              <Horario activities={atividades3} day={day} />
             </div>
           </Horarios >
         </> : <p>Erro! Tente novamente mais tarde</p>
