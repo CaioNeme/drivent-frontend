@@ -115,12 +115,13 @@ const Traco = styled.div`
   height: 60px;
   background: #cfcfcf;
 `;
+
 const Vagas = styled.div`
   position: absolute;
   top: 14px;
-  right: 25px;
+  right: 18px;
   flex-shrink: 0;
-
+  
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -141,7 +142,7 @@ const EnrollButton = styled.button`
     font-style: normal;
     font-weight: 400;
     line-height: normal;
-    margin-left: 5px;
+    margin-left: 7px;
   }
 
   ion-icon {
@@ -156,6 +157,9 @@ const SoldOutButton = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: absolute;
+  top: 1px;
+  right: -15px;
 
   p {
     color: #c66; 
@@ -180,6 +184,9 @@ const EnrolledButton = styled.button`
   align-items: center;
   border: none;
   background-color: transparent;
+  position: absolute;
+  top: -2px;
+  right: -15px;
 
   p {
     color: #078632;
